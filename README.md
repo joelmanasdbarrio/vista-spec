@@ -1,4 +1,4 @@
-# vista OpenAPI Definition
+# Vista OpenAPI Definition
 
 ## Working on your OpenAPI Definition
 
@@ -9,13 +9,10 @@
 
 ### Usage
 
-#### `npm start`
-Starts the reference docs preview server.
-
-#### `npm run build`
-Bundles the definition to the dist folder.
-
-#### `npm test`
+#### `npm run validate`
 Validates the definition.
+
+#### `npm run generate:types`
+Generates TypeScript types from the definition.
 
 [OpenAPI specification](https://swagger.io/docs/specification/v3_0/about/)
