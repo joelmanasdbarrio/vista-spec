@@ -1,0 +1,17 @@
+{
+  "name": "vista",
+  "author": {
+    "name": "Joel Mañas del Barrio",
+    "email": "joelmanasdbarrio@gmail.com",
+    "url": "https://www.linkedin.com/in/joel-ma%C3%B1as-del-barrio/"
+  },
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "validate": "npx swagger-cli validate openapi/openapi-rest.yaml",
+    "generate:types": "openapi-typescript openapi/openapi-rest.yaml --output types/index.d.ts"
+  },
+  "devDependencies": {
+    "openapi-typescript": "^7.6.1"
+  }
+}

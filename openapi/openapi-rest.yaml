@@ -1,0 +1,1391 @@
+openapi: 3.0.4
+info:
+  title: Vista API
+  version: 1.0.0
+  contact:
+    name: Joel Mañas del Barrio
+    email: joelmanasdbarrio@gmail.com
+  license:
+    name: Apache 2.0
+    url: 'http://www.apache.org/licenses/LICENSE-2.0.html'
+  description: >
+    API specification for **Vista** app
+externalDocs:
+  description: Find out more
+  url: http://example.com
+tags:
+  - name: Accounts
+    description: Account operations
+  - name: Notifications
+    description: Notification operations
+  - name: Establishments
+    description: Establishment operations
+  - name: Activities
+    description: Activity operations
+servers:
+  - url: 'http://localhost:8080/api/v1'
+    description: Local server
+security:
+  - bearerAuth: []
+paths:
+  /accounts:
+    get:
+      tags:
+        - Accounts
+      summary: Get accounts
+      operationId: getAccounts
+      description: Get all accounts
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/accountTypeParam'
+        - $ref: '#/components/parameters/accountNameParam'
+        - $ref: '#/components/parameters/accountUsernameParam'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/AccountDTO'
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /accounts/{id}:
+    get:
+      tags:
+        - Accounts
+      summary: Get account
+      operationId: getAccount
+      description: Get one account
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/accountIdParam'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccountDTO'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    patch:
+      tags:
+        - Accounts
+      summary: Update account
+      operationId: updateAccount
+      description: Update one account
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/accountIdParam'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AccountDTO'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccountDTO'
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    delete:
+      tags:
+        - Accounts
+      summary: Delete account
+      operationId: deleteAccount
+      description: Delete one account
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/accountIdParam'
+      responses:
+        '204':
+          description: No Content
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /accounts/{id}/followers:
+    get:
+      tags:
+        - Accounts
+      summary: Get account followers
+      operationId: getAccountFollowers
+      description: Get account followers
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/accountIdParam'
+        - $ref: '#/components/parameters/accountNameParam'
+        - $ref: '#/components/parameters/accountUsernameParam'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/AccountDTO'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /accounts/{id}/followings:
+    get:
+      tags:
+        - Accounts
+      summary: Get account followings
+      operationId: getAccountFollowings
+      description: Get account followings
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/accountIdParam'
+        - $ref: '#/components/parameters/accountNameParam'
+        - $ref: '#/components/parameters/accountUsernameParam'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/AccountDTO'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /accounts/{id}/follow:
+    post:
+      tags:
+        - Accounts
+      summary: Follow account
+      operationId: followAccount
+      description: Follow account
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/accountIdParam'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FollowDTO'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    delete:
+      tags:
+        - Accounts
+      summary: Unfollow account
+      operationId: unfollowAccount
+      description: Unfollow account
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/accountIdParam'
+      responses:
+        '204':
+          description: No Content
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /notifications:
+    get:
+      tags:
+        - Notifications
+      summary: Get notifications
+      operationId: getNotifications
+      description: Get all notifications
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/NotificationDTO'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /notifications/{id}:
+    patch:
+      tags:
+        - Notifications
+      summary: Update notification
+      operationId: updateNotification
+      description: Update one notification
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/notificationIdParam'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NotificationDTO'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotificationDTO'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /establishments:
+    get:
+      tags:
+        - Establishments
+      summary: Get establishments
+      operationId: getEstablishments
+      description: Get all establishments
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/establishmentNameParam'
+        - $ref: '#/components/parameters/establishmentAddressParam'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/EstablishmentDTO'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    post:
+      tags:
+        - Establishments
+      summary: Create establishment
+      operationId: createEstablishment
+      description: Create establishment
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EstablishmentDTO'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EstablishmentDTO'
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /establishments/{id}:
+    get:
+      tags:
+        - Establishments
+      summary: Get establishment
+      operationId: getEstablishment
+      description: Get one establishment
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/establishmentIdParam'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EstablishmentDTO'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    patch:
+      tags:
+        - Establishments
+      summary: Update establishment
+      operationId: updateEstablishment
+      description: Update one establishment
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/establishmentIdParam'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EstablishmentDTO'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EstablishmentDTO'
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    delete:
+      tags:
+        - Establishments
+      summary: Delete establishment
+      operationId: deleteEstablishment
+      description: Delete one establishment
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/establishmentIdParam'
+      responses:
+        '204':
+          description: No Content
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /establishments/requests:
+    get:
+      tags:
+        - Establishments
+      summary: Get establishment requests
+      operationId: getEstablishmentRequests
+      description: Get all establishment requests
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/EstablishmentRequestDTO'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    post:
+      tags:
+        - Establishments
+      summary: Create establishment request
+      operationId: createEstablishmentRequest
+      description: Create establishment request
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EstablishmentRequestDTO'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EstablishmentRequestDTO'
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /establishments/requests/{id}:
+    patch:
+      tags:
+        - Establishments
+      summary: Update establishment request
+      operationId: updateEstablishmentRequest
+      description: Update one establishment request
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/establishmentRequestIdParam'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EstablishmentRequestDTO'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EstablishmentRequestDTO'
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    delete:
+      tags:
+        - Establishments
+      summary: Delete establishment request
+      operationId: deleteEstablishmentRequest
+      description: Delete one establishment request
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/establishmentRequestIdParam'
+      responses:
+        '204':
+          description: No Content
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /activities:
+    get:
+      tags:
+        - Activities
+      summary: Get activities
+      operationId: getActivities
+      description: Get all activities
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/activityTypeParam'
+        - $ref: '#/components/parameters/activityTitleParam'
+        - $ref: '#/components/parameters/activityDescriptionParam'
+        - $ref: '#/components/parameters/activityCategoryIdParam'
+        - $ref: '#/components/parameters/activityMinPriceParam'
+        - $ref: '#/components/parameters/activityMaxPriceParam'
+        - $ref: '#/components/parameters/activityTimeStartParam'
+        - $ref: '#/components/parameters/activityTimeEndParam'
+        - $ref: '#/components/parameters/activityMinParcipantsParam'
+        - $ref: '#/components/parameters/activityMaxParcipantsParam'
+        - $ref: '#/components/parameters/activityMinEntriesParam'
+        - $ref: '#/components/parameters/activityMaxEntriesParam'
+        - $ref: '#/components/parameters/activityLanguageParam'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ActivityDTO'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    post:
+      tags:
+        - Activities
+      summary: Create activity
+      operationId: createActivity
+      description: Create activity
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ActivityDTO'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ActivityDTO'
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /activities/{id}:
+    get:
+      tags:
+        - Activities
+      summary: Get activity
+      operationId: getActivity
+      description: Get one activity
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/activityIdParam'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ActivityDTO'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    patch:
+      tags:
+        - Activities
+      summary: Update activity
+      operationId: updateActivity
+      description: Update one activity
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/activityIdParam'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ActivityDTO'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ActivityDTO'
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    delete:
+      tags:
+        - Activities
+      summary: Delete activity
+      operationId: deleteActivity
+      description: Delete one activity
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/activityIdParam'
+      responses:
+        '204':
+          description: No Content
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /activity/{id}/participants:
+    get:
+      tags:
+        - Activities
+      summary: Get activity participants
+      operationId: getActivityParticipants
+      description: Get all activity participants
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/activityIdParam'
+        - $ref: '#/components/parameters/accountNameParam'
+        - $ref: '#/components/parameters/accountUsernameParam'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ActivityParticipantDTO'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    post:
+      tags:
+        - Activities
+      summary: Join activity
+      operationId: joinActivity
+      description: Join activity
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/activityIdParam'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ActivityParticipantDTO'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    delete:
+      tags:
+        - Activities
+      summary: Leave activity
+      operationId: leaveActivity
+      description: Leave activity
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/activityIdParam'
+      responses:
+        '204':
+          description: No Content
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /activity/categories:
+    get:
+      tags:
+        - Activities
+      summary: Get activity categories
+      operationId: getActivityCategories
+      description: Get all activity categories
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ActivityCategoryDTO'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+components:
+  schemas:
+    AccountDTO:
+      oneOf:
+        - $ref: '#/components/schemas/PersonalAccountDTO'
+        - $ref: '#/components/schemas/EnterpriseAccountDTO'
+      discriminator:
+        propertyName: type
+    PersonalAccountDTO:
+      allOf:
+        - $ref: '#/components/schemas/AccountBase'
+      type: object
+      required:
+        - type
+      properties:
+        type:
+          type: string
+          enum:
+            - personal
+    EnterpriseAccountDTO:
+      allOf:
+        - $ref: '#/components/schemas/AccountBase'
+      type: object
+      required:
+        - type
+      properties:
+        verified:
+          type: boolean
+          default: false
+        type:
+          type: string
+          enum:
+            - enterprise
+    AccountBase:
+      type: object
+      required:
+        - name
+        - username
+        - email
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+          minLength: 2
+          maxLength: 50
+          pattern: '(^[a-zA-Zñ\s]+$)'
+        username:
+          type: string
+          minLength: 4
+          maxLength: 30
+          pattern: '(^[a-z_0-9]+$)'
+        email:
+          type: string
+          pattern: '^[A-Za-z0-9._%+-]+@(?:gmail|hotmail|outlook|yahoo|icloud|aol|zoho|mail|protonmail|inbox|gmx|yandex|mailinator|disroot|tutanota|fastmail|startmail|runbox|hushmail|mailfence|posteo|riseup|kolabnow|mailbox|openmailbox|airmail|comcast|att|verizon|shaw|telus|charter|frontier|cox|btinternet|talktalk|virginmedia|sky|o2|orange|free|sfr|numericable|laposte|bouyguestelecom|neuf|alice|libero)\.[A-Za-z]{2,}$'
+        biography:
+          type: string
+        avatar:
+          type: string
+        website:
+          type: string
+        private:
+          type: boolean
+          default: false
+    FollowDTO:
+      type: object
+      required:
+        - id
+        - follower
+        - following
+      properties:
+        id:
+          type: string
+          format: uuid
+        follower:
+          $ref: '#/components/schemas/PersonalAccountDTO'
+        following:
+          $ref: '#/components/schemas/AccountDTO'
+        createdAt:
+          type: string
+          format: date-time
+    NotificationDTO:
+      type: object
+      required:
+        - id
+        - type
+        - account
+        - read
+        - createdAt
+      properties:
+        id:
+          type: string
+          format: uuid
+        type:
+          type: string
+          enum:
+            - follow
+            - entry
+            - activity
+            - system
+        isRead:
+          type: boolean
+          default: false
+        owner:
+          $ref: '#/components/schemas/AccountDTO'
+        relatedAccount:
+          $ref: '#/components/schemas/AccountDTO'
+        relatedActivity:
+          $ref: '#/components/schemas/ActivityDTO'
+        createdAt:
+          type: string
+          format: date-time
+    EstablishmentDTO:
+      type: object
+      required:
+        - owner
+        - address
+        - name
+      properties:
+        id:
+          type: string
+          format: uuid
+        owner:
+          $ref: '#/components/schemas/EnterpriseAccountDTO'
+        address:
+          $ref: '#/components/schemas/AddressDTO'
+        name:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+    EstablishmentRequestDTO:
+      type: object
+      required:
+        - owner
+        - establishment
+        - account
+      properties:
+        id:
+          type: string
+          format: uuid
+        owner:
+          $ref: '#/components/schemas/EnterpriseAccountDTO'
+        relatedAccount:
+          $ref: '#/components/schemas/EnterpriseAccountDTO'
+        relatedEstablishment:
+          $ref: '#/components/schemas/EstablishmentDTO'
+        status:
+          type: string
+          enum:
+            - pending
+            - accepted
+            - rejected
+        createdAt:
+          type: string
+          format: date-time
+    AddressDTO:
+      type: object
+      required:
+        - country
+        - postalCode
+        - city
+        - street
+        - number
+        - coordinates
+      properties:
+        country:
+          type: string
+        postalCode:
+          type: string
+        city:
+          type: string
+        street:
+          type: string
+        number:
+          type: string
+        block:
+          type: string
+        floor:
+          type: string
+        door:
+          type: string
+        coordinates:
+          type: object
+          properties:
+            latitude:
+              type: number
+              format: double
+            longitude:
+              type: number
+              format: double
+    ActivityDTO:
+      oneOf:
+        - $ref: '#/components/schemas/MapActivityDTO'
+        - $ref: '#/components/schemas/OnlineActivityDTO'
+      discriminator:
+        propertyName: type
+    MapActivityDTO:
+      allOf:
+        - $ref: '#/components/schemas/ActivityBase'
+      type: object
+      required:
+        - location
+        - type
+      properties:
+        location:
+          oneOf:
+            - $ref: '#/components/schemas/EstablishmentDTO'
+            - $ref: '#/components/schemas/AddressDTO'
+        type:
+          type: string
+          enum:
+            - map
+    OnlineActivityDTO:
+      allOf:
+        - $ref: '#/components/schemas/ActivityBase'
+      type: object
+      required:
+        - location
+        - type
+      properties:
+        location:
+          type: object
+          required:
+            - url
+          properties:
+            url:
+              type: string
+        type:
+          type: string
+          enum:
+            - online
+    ActivityBase:
+      type: object
+      required:
+        - owner
+        - title
+        - description
+        - category
+        - price
+        - time
+        - language
+      properties:
+        id:
+          type: string
+          format: uuid
+        owner:
+          $ref: '#/components/schemas/AccountDTO'
+        title:
+          type: string
+        description:
+          type: string
+        category:
+          $ref: '#/components/schemas/ActivityCategoryDTO'
+        photos:
+          type: array
+          items:
+            type: string
+        price:
+          type: object
+          properties:
+            min:
+              type: number
+              format: double
+            max:
+              type: number
+              format: double
+            currency:
+              type: string
+        time:
+          type: object
+          properties:
+            start:
+              type: string
+              format: date-time
+            end:
+              type: string
+              format: date-time
+        participants:
+          type: object
+          properties:
+            min:
+              type: integer
+              format: int32
+            max:
+              type: integer
+              format: int32
+        language:
+          type: string
+        website:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+    ActivityCategoryDTO:
+      type: object
+      required:
+        - id
+        - name
+        - i18nKey
+        - icon
+      properties:
+        id:
+          type: string
+          format: uuid
+        parent:
+          $ref: '#/components/schemas/ActivityCategoryDTO'
+        name:
+          type: string
+        i18nKey:
+          type: string
+        icon:
+          type: string
+        color:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+    ActivityParticipantDTO:
+      type: object
+      required:
+        - id
+        - activity
+        - account
+      properties:
+        id:
+          type: string
+          format: uuid
+        activity:
+          $ref: '#/components/schemas/ActivityDTO'
+        account:
+          $ref: '#/components/schemas/PersonalAccountDTO'
+        createdAt:
+          type: string
+          format: date-time
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  parameters:
+    accountIdParam:
+      name: id
+      description: Account ID
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    accountTypeParam:
+      name: type
+      description: Account type
+      in: query
+      schema:
+        type: string
+        enum:
+          - personal
+          - enterprise
+    accountNameParam:
+      name: name
+      description: Account name
+      in: query
+      schema:
+        type: string
+        minLength: 2
+        maxLength: 50
+        pattern: '(^[a-zA-Zñ\s]+$)'
+    accountUsernameParam:
+      name: username
+      description: Account username
+      in: query
+      schema:
+        type: string
+        minLength: 4
+        maxLength: 30
+        pattern: '(^[a-z_0-9]+$)'
+    notificationIdParam:
+      name: id
+      description: Notification ID
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    establishmentIdParam:
+      name: id
+      description: Establishment ID
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    establishmentNameParam:
+      name: name
+      description: Establishment name
+      in: query
+      schema:
+        type: string
+    establishmentAddressParam:
+      name: address
+      description: Establishment address
+      in: query
+      schema:
+        type: string
+    establishmentRequestIdParam:
+      name: id
+      description: Establishment request ID
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    activityIdParam:
+      name: id
+      description: Activity ID
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    activityTitleParam:
+      name: title
+      description: Activity title
+      in: query
+      schema:
+        type: string
+    activityDescriptionParam:
+      name: description
+      description: Activity description
+      in: query
+      schema:
+        type: string
+    activityCategoryIdParam:
+      name: categoryId
+      description: Activity category ID
+      in: query
+      schema:
+        type: string
+        format: uuid
+    activityMinPriceParam:
+      name: minPrice
+      description: Activity min price
+      in: query
+      schema:
+        type: number
+        format: double
+    activityMaxPriceParam:
+      name: maxPrice
+      description: Activity max price
+      in: query
+      schema:
+        type: number
+        format: double
+    activityLanguageParam:
+      name: language
+      description: Activity language
+      in: query
+      schema:
+        type: string
+    activityTypeParam:
+      name: type
+      description: Activity type
+      in: query
+      schema:
+        type: string
+        enum:
+          - map
+          - online
+    activityTimeStartParam:
+      name: timeStart
+      description: Activity time start
+      in: query
+      schema:
+        type: string
+        format: date-time
+    activityTimeEndParam:
+      name: timeEnd
+      description: Activity time end
+      in: query
+      schema:
+        type: string
+        format: date-time
+    activityMinParcipantsParam:
+      name: minParticipants
+      description: Activity min participants
+      in: query
+      schema:
+        type: integer
+        format: int32
+    activityMaxParcipantsParam:
+      name: maxParticipants
+      description: Activity max participants
+      in: query
+      schema:
+        type: integer
+        format: int32
+    activityMinEntriesParam:
+      name: minEntries
+      description: Activity min entries
+      in: query
+      schema:
+        type: integer
+        format: int32
+    activityMaxEntriesParam:
+      name: maxEntries
+      description: Activity max entries
+      in: query
+      schema:
+        type: integer
+        format: int32
+  responses:
+    BadRequestError:
+      description: Bad Request
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+                example: Bad Request
+              code:
+                type: string
+                example: BAD_REQUEST
+              status:
+                type: integer
+                format: int32
+                example: 400
+    UnauthorizedError:
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+                example: Unauthorized
+              code:
+                type: string
+                example: UNAUTHORIZED
+              status:
+                type: integer
+                format: int32
+                example: 401
+    ForbiddenError:
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+                example: Forbidden
+              code:
+                type: string
+                example: FORBIDDEN
+              status:
+                type: integer
+                format: int32
+                example: 403
+    NotFoundError:
+      description: Not Found
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+                example: Not Found
+              code:
+                type: string
+                example: NOT_FOUND
+              status:
+                type: integer
+                format: int32
+                example: 404
+    InternalServerError:
+      description: Internal Server Error
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+                example: Internal Server Error
+              code:
+                type: string
+                example: INTERNAL_SERVER_ERROR
+              status:
+                type: integer
+                format: int32
+                example: 500
