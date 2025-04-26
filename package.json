@@ -1,5 +1,5 @@
 {
-  "name": "vista",
+  "name": "@vista/vista-spec",
   "author": {
     "name": "Joel Mañas del Barrio",
     "email": "joelmanasdbarrio@gmail.com",
@@ -7,6 +7,12 @@
   },
   "version": "1.0.0",
   "private": true,
+  "main": "openapi/openapi-rest.yaml",
+  "types": "types/index.d.ts",
+  "files": [
+    "types/index.d.ts",
+    "openapi/openapi-rest.yaml"
+  ],
   "scripts": {
     "validate": "npx swagger-cli validate openapi/openapi-rest.yaml",
     "generate:types": "openapi-typescript openapi/openapi-rest.yaml --output types/index.d.ts"
