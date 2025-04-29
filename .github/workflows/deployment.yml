@@ -92,7 +92,7 @@ jobs:
         with:
           node-version: '18'
           registry-url: 'https://npm.pkg.github.com/'
-          scope: '@vista'
+          scope: '@joelmanasdbarrio'
 
       - run: npm ci
 
@@ -126,4 +126,4 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
           issue-number: ${{ github.event.pull_request.number }}
           body: |
-            ✅ Publicado paquete **@vista/vista-spec@${{ steps.ver.outputs.new_version }}** con dist-tag `${{ steps.ver.outputs.dist_tag }}`.
+            ✅ Publicado paquete **@joelmanasdbarrio/vista-spec@${{ steps.ver.outputs.new_version }}** con dist-tag `${{ steps.ver.outputs.dist_tag }}`.
