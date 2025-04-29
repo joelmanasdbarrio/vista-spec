@@ -118,6 +118,9 @@ jobs:
           echo "new_version=$NEW" >> $GITHUB_OUTPUT
           echo "dist_tag=$TAG"    >> $GITHUB_OUTPUT
 
+      - name: Authenticate to GitHub Packages
+        run: echo "//npm.pkg.github.com/:_authToken=${{ secrets.DEPLOYMENT_TOKEN }}" > ~/.npmrc
+
       - name: Publish package
         run: |
           if [ "${{ steps.ver.outputs.dist_tag }}" = "latest" ]; then
