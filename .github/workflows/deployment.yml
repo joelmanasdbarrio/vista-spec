@@ -82,55 +82,41 @@ jobs:
   publish-package:
     needs: generate-types
     runs-on: ubuntu-latest
-    if: >
-      github.event.pull_request.base.ref == 'dev' ||
-      github.event.pull_request.base.ref == 'release' ||
-      (github.event.pull_request.base.ref == 'main' && github.event.pull_request.merged == true)
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v3
+      - uses: actions/checkout@v3
         with:
           persist-credentials: true
 
-      - name: Setup Node.js for GitHub Packages
+      - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
           node-version: '18'
           registry-url: 'https://npm.pkg.github.com/'
           scope: '@vista'
 
-      - name: Install dependencies
-        run: npm ci
-
-      - name: Configure Git author
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+      - run: npm ci
 
       - name: Determine version and tag
         id: ver
         run: |
-          BRANCH=${GITHUB_HEAD_REF:-${GITHUB_REF##*/}}
+          BRANCH=${GITHUB_BASE_REF:-${GITHUB_REF#refs/heads/}}
           if [ "$BRANCH" = "dev" ]; then
-            NEW=$(npm version prerelease --preid=dev)
+            NEW=$(npm version prerelease --preid=dev --git-tag-version=false)
             TAG=dev
           elif [ "$BRANCH" = "release" ]; then
-            NEW=$(npm version prerelease --preid=rc)
+            CURRENT_VERSION=$(npm pkg get version | sed 's/"//g')
+            NEW="$CURRENT_VERSION-rc"
+            npm version $NEW --force --git-tag-version=false
             TAG=rc
           else
-            NEW=$(npm version patch)
+            NEW=$(npm pkg get version | sed 's/"//g')
             TAG=latest
           fi
           echo "new_version=$NEW" >> $GITHUB_OUTPUT
-          echo "dist_tag=$TAG"    >> $GITHUB_OUTPUT
+          echo "dist_tag=$TAG" >> $GITHUB_OUTPUT
 
       - name: Publish to GitHub Packages
-        run: |
-          if [ "${{ steps.ver.outputs.dist_tag }}" = "latest" ]; then
-            npm publish
-          else
-            npm publish --tag "${{ steps.ver.outputs.dist_tag }}"
-          fi
+        run: npm publish --tag ${{ steps.ver.outputs.dist_tag }}
         env:
           NODE_AUTH_TOKEN: ${{ secrets.DEPLOYMENT_TOKEN }}
 
@@ -140,4 +126,4 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
           issue-number: ${{ github.event.pull_request.number }}
           body: |
-            ✅ Se publicó la versión **${{ steps.ver.outputs.new_version }}** con dist-tag `**${{ steps.ver.outputs.dist_tag }}**`.
+            ✅ Publicado paquete **@vista/vista-spec@${{ steps.ver.outputs.new_version }}** con dist-tag `${{ steps.ver.outputs.dist_tag }}`.
