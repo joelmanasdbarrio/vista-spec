@@ -114,23 +114,31 @@ jobs:
       - name: Determine version and tag
         id: ver
         run: |
-          BRANCH=${GITHUB_HEAD_REF:-${GITHUB_REF##*/}}
+          BRANCH="${GITHUB_BASE_REF:-${GITHUB_REF##*/}}"
+          echo "PR base branch = $BRANCH"
 
           if [ "$BRANCH" = "dev" ]; then
+            # prerelease dev
             NEW=$(npm version prerelease --preid=dev)
             TAG=dev
+
           elif [ "$BRANCH" = "release" ]; then
+            # release candidate
             CURRENT=$(npm pkg get version | sed 's/"//g')
             NEW="$CURRENT-rc"
             npm version "$NEW" --force
             TAG=rc
+
           else
+            # release stable
             NEW=$(npm version patch)
             TAG=latest
           fi
 
           echo "new_version=$NEW" >> $GITHUB_OUTPUT
           echo "dist_tag=$TAG"    >> $GITHUB_OUTPUT
+        env:
+          CI: true
 
       - name: Authenticate to GitHub Packages
         run: |
