@@ -1,23 +1,22 @@
 name: CI & Publish OpenAPI Package
 
 permissions:
-  contents: write           # para commits y pushes
-  packages: write           # para publicar en GitHub Packages
+  contents: write
+  packages: write
 
 on:
   pull_request:
     branches:
-      - dev       # corre en PRs hacia dev
-      - release   # corre en PRs hacia release
-      - main      # corre en PRs hacia main
+      - dev
+      - release
+      - main
     types:
       - opened
       - synchronize
       - reopened
-      - closed    # para PR cerrado y mergeado
+      - closed
 
 jobs:
-  # ── 1. VALIDATE ────────────────────────────────────────────────────
   validate-specification:
     if: github.event_name == 'pull_request'
     runs-on: ubuntu-latest
@@ -29,7 +28,6 @@ jobs:
       - run: npm run validate
         name: Validate OpenAPI spec
 
-  # ── 2. CHECK VERSIONS ─────────────────────────────────────────────
   check-version:
     needs: validate-specification
     if: github.event_name == 'pull_request'
@@ -58,7 +56,6 @@ jobs:
           fi
         name: Ensure versions match
 
-  # ── 3. GENERATE TYPES ─────────────────────────────────────────────
   generate-types:
     needs: check-version
     if: github.event_name == 'pull_request'
@@ -78,8 +75,12 @@ jobs:
           author_email: 41898282+github-actions[bot]@users.noreply.github.com
           message: "regenerate OpenAPI types"
 
-  # ── 4. PUBLISH PACKAGE ────────────────────────────────────────────
   publish-package:
+    permissions:
+      contents: write
+      packages: write
+      issues: write
+      pull-requests: write
     needs: generate-types
     runs-on: ubuntu-latest
     steps:
