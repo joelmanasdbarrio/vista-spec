@@ -126,12 +126,12 @@ jobs:
             npm publish --access=restricted --tag "${{ steps.ver.outputs.dist_tag }}"
           fi
         env:
-          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NODE_AUTH_TOKEN: ${{ secrets.DEPLOYMENT_TOKEN }}
 
       - name: Comment on PR with result
         uses: peter-evans/create-or-update-comment@v2
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}
+          token: ${{ secrets.DEPLOYMENT_TOKEN }}
           issue-number: ${{ github.event.pull_request.number }}
           body: |
             ✅ Se publicó la versión **${{ steps.ver.outputs.new_version }}** con dist-tag `**${{ steps.ver.outputs.dist_tag }}**`.

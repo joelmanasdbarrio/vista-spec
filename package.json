@@ -19,5 +19,9 @@
   },
   "devDependencies": {
     "openapi-typescript": "^7.6.1"
+  },
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com/",
+    "access": "restricted"
   }
 }
