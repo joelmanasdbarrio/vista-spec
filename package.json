@@ -6,7 +6,6 @@
     "url": "https://www.linkedin.com/in/joel-ma%C3%B1as-del-barrio/"
   },
   "version": "1.0.0",
-  "private": true,
   "main": "openapi/openapi-rest.yaml",
   "types": "types/index.d.ts",
   "files": [
