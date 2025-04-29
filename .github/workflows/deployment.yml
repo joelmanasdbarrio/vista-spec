@@ -88,6 +88,11 @@ jobs:
       github.event.pull_request.base.ref == 'release' ||
       (github.event_name == 'pull_request' && github.event.action == 'closed' && github.event.pull_request.merged == true && github.event.pull_request.base.ref == 'main')
     steps:
+      - name: Authenticate to GitHub Packages
+        run: |
+          echo "@vista:registry=https://npm.pkg.github.com/" >> ~/.npmrc
+          echo "//npm.pkg.github.com/:_authToken=${{ secrets.DEPLOYMENT_TOKEN }}" >> ~/.npmrc
+
       - uses: actions/checkout@v3
       - uses: actions/setup-node@v3
         with:
@@ -117,9 +122,6 @@ jobs:
           fi
           echo "new_version=$NEW" >> $GITHUB_OUTPUT
           echo "dist_tag=$TAG"    >> $GITHUB_OUTPUT
-
-      - name: Authenticate to GitHub Packages
-        run: echo "//npm.pkg.github.com/:_authToken=${{ secrets.DEPLOYMENT_TOKEN }}" > ~/.npmrc
 
       - name: Publish package
         run: |
