@@ -77,47 +77,73 @@ jobs:
 
   publish-package:
     permissions:
-      contents: write
-      packages: write
-      issues: write
-      pull-requests: write
+      contents: write           # Necesario para git commit/tag/push
+      packages: write           # Necesario para npm publish en GitHub Packages
+      issues: write             # Necesario para comentar en PRs
+      pull-requests: write      # Necesario para comentar en pull requests
     needs: generate-types
     runs-on: ubuntu-latest
+    if: >
+      github.event.pull_request.base.ref == 'dev' ||
+      github.event.pull_request.base.ref == 'release' ||
+      (github.event.pull_request.base.ref == 'main' && github.event.pull_request.merged == true)
+
     steps:
-      - uses: actions/checkout@v3
+      - name: Checkout repository (with full history + tags)
+        uses: actions/checkout@v3
         with:
           persist-credentials: true
+          fetch-depth: 0
+          fetch-tags: true
 
-      - name: Setup Node.js
+      - name: Setup Node.js for GitHub Packages
         uses: actions/setup-node@v3
         with:
           node-version: '18'
           registry-url: 'https://npm.pkg.github.com/'
           scope: '@joelmanasdbarrio'
 
-      - run: npm ci
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Configure Git author
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
       - name: Determine version and tag
         id: ver
         run: |
-          BRANCH=${GITHUB_BASE_REF:-${GITHUB_REF#refs/heads/}}
+          BRANCH=${GITHUB_HEAD_REF:-${GITHUB_REF##*/}}
+
           if [ "$BRANCH" = "dev" ]; then
-            NEW=$(npm version prerelease --preid=dev --git-tag-version=false)
+            NEW=$(npm version prerelease --preid=dev)
             TAG=dev
           elif [ "$BRANCH" = "release" ]; then
-            CURRENT_VERSION=$(npm pkg get version | sed 's/"//g')
-            NEW="$CURRENT_VERSION-rc"
-            npm version $NEW --force --git-tag-version=false
+            CURRENT=$(npm pkg get version | sed 's/"//g')
+            NEW="$CURRENT-rc"
+            npm version "$NEW" --force
             TAG=rc
           else
-            NEW=$(npm pkg get version | sed 's/"//g')
+            NEW=$(npm version patch)
             TAG=latest
           fi
+
           echo "new_version=$NEW" >> $GITHUB_OUTPUT
-          echo "dist_tag=$TAG" >> $GITHUB_OUTPUT
+          echo "dist_tag=$TAG"    >> $GITHUB_OUTPUT
+
+      - name: Authenticate to GitHub Packages
+        run: |
+          echo "@joelmanasdbarrio:registry=https://npm.pkg.github.com/" >> ~/.npmrc
+          echo "//npm.pkg.github.com/:_authToken=${{ secrets.DEPLOYMENT_TOKEN }}" >> ~/.npmrc
 
       - name: Publish to GitHub Packages
-        run: npm publish --tag ${{ steps.ver.outputs.dist_tag }}
+        run: |
+          if [ "${{ steps.ver.outputs.dist_tag }}" = "latest" ]; then
+            npm publish
+          else
+            npm publish --tag "${{ steps.ver.outputs.dist_tag }}"
+          fi
         env:
           NODE_AUTH_TOKEN: ${{ secrets.DEPLOYMENT_TOKEN }}
 
@@ -127,4 +153,4 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
           issue-number: ${{ github.event.pull_request.number }}
           body: |
-            ✅ Publicado paquete **@joelmanasdbarrio/vista-spec@${{ steps.ver.outputs.new_version }}** con dist-tag `${{ steps.ver.outputs.dist_tag }}`.
+            ✅ Publicado paquete **@joelmanasdbarrio/vista-spec@${{ steps.ver.outputs.new_version }}** con dist-tag `**${{ steps.ver.outputs.dist_tag }}**`.
