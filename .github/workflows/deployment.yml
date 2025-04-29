@@ -82,23 +82,25 @@ jobs:
   publish-package:
     needs: generate-types
     runs-on: ubuntu-latest
-    # Solo en PR hacia dev, release o cierre de PR a main
-    if: |
+    if: >
       github.event.pull_request.base.ref == 'dev' ||
       github.event.pull_request.base.ref == 'release' ||
-      (github.event_name == 'pull_request' && github.event.action == 'closed' && github.event.pull_request.merged == true && github.event.pull_request.base.ref == 'main')
+      (github.event.pull_request.base.ref == 'main' && github.event.pull_request.merged == true)
     steps:
-      - name: Authenticate to GitHub Packages
-        run: |
-          echo "@vista:registry=https://npm.pkg.github.com/" >> ~/.npmrc
-          echo "//npm.pkg.github.com/:_authToken=${{ secrets.DEPLOYMENT_TOKEN }}" >> ~/.npmrc
+      - name: Checkout repository
+        uses: actions/checkout@v3
+        with:
+          persist-credentials: true
 
-      - uses: actions/checkout@v3
-      - uses: actions/setup-node@v3
+      - name: Setup Node.js for GitHub Packages
+        uses: actions/setup-node@v3
         with:
           node-version: '18'
-          registry-url: https://npm.pkg.github.com/
-      - run: npm ci
+          registry-url: 'https://npm.pkg.github.com/'
+          scope: '@vista'
+
+      - name: Install dependencies
+        run: npm ci
 
       - name: Configure Git author
         run: |
@@ -109,7 +111,6 @@ jobs:
         id: ver
         run: |
           BRANCH=${GITHUB_HEAD_REF:-${GITHUB_REF##*/}}
-          echo "Branch = $BRANCH"
           if [ "$BRANCH" = "dev" ]; then
             NEW=$(npm version prerelease --preid=dev)
             TAG=dev
@@ -123,12 +124,12 @@ jobs:
           echo "new_version=$NEW" >> $GITHUB_OUTPUT
           echo "dist_tag=$TAG"    >> $GITHUB_OUTPUT
 
-      - name: Publish package
+      - name: Publish to GitHub Packages
         run: |
           if [ "${{ steps.ver.outputs.dist_tag }}" = "latest" ]; then
-            npm publish --access=restricted
+            npm publish
           else
-            npm publish --access=restricted --tag "${{ steps.ver.outputs.dist_tag }}"
+            npm publish --tag "${{ steps.ver.outputs.dist_tag }}"
           fi
         env:
           NODE_AUTH_TOKEN: ${{ secrets.DEPLOYMENT_TOKEN }}
@@ -136,7 +137,7 @@ jobs:
       - name: Comment on PR with result
         uses: peter-evans/create-or-update-comment@v2
         with:
-          token: ${{ secrets.DEPLOYMENT_TOKEN }}
+          token: ${{ secrets.GITHUB_TOKEN }}
           issue-number: ${{ github.event.pull_request.number }}
           body: |
             ✅ Se publicó la versión **${{ steps.ver.outputs.new_version }}** con dist-tag `**${{ steps.ver.outputs.dist_tag }}**`.
