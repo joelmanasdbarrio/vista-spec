@@ -2,7 +2,7 @@ name: Cleanup old dev/rc package versions
 
 on:
   schedule:
-    - cron: '0 6 * * *' # Every day at 6am UTC
+    - cron: '0 18 * * *' # Every day at 6am UTC
 
 jobs:
   cleanup:
