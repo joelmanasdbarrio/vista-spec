@@ -29,7 +29,7 @@ jobs:
       - name: Eliminar versiones dev/rc antiguas
         run: |
           now=$(date +%s)
-          cutoff=$(( CLEANUP_AFTER * 3600 ))
+          cutoff=$(( CLEANUP_AFTER * 86400 ))
           jq -c '.[]' versions.json | while read pkg; do
             name=$(jq -r .name <<<"$pkg")
             created=$(jq -r .created_at <<<"$pkg")
@@ -37,7 +37,8 @@ jobs:
             age=$(( now - created_ts ))
             if [[ $age -gt $cutoff && "$name" =~ (dev|rc) ]]; then
               id=$(jq -r .id <<<"$pkg")
-              echo "Deleting $name (id=$id), $(( age / 3600 ))h old"
+              days=$(( age / 86400 ))
+              echo "Deleting $name (id=$id), $days days old"
               gh api --method DELETE \
                 -H "Accept: application/vnd.github+json" \
                 /user/packages/$PACKAGE_TYPE/$PACKAGE_NAME/versions/$id
