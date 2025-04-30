@@ -13,56 +13,31 @@ jobs:
   cleanup:
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v4
       - name: Get package name from package.json
         id: pkg
         run: echo "PACKAGE_NAME=$(jq -r .name package.json)" >> $GITHUB_ENV
       - name: List and delete old dev/rc versions
         env:
           GH_TOKEN: ${{ secrets.CLEANUP_TOKEN }}
-          PACKAGE_NAME: '@joelmanasdbarrio/vista-spec'
-          OWNER: ${{ github.repository_owner }}
+          OWNER: joelmanasdbarrio
           CLEANUP_AFTER: ${{ vars.CLEANUP_AFTER }}
-        # run: |
-        #   # Get all versions with dev or rc in the version string
-        #   gh api -H "Accept: application/vnd.github+json" \
-        #     /users/$OWNER/packages/npm/${PACKAGE_NAME}/versions \
-        #     --paginate > versions.json
-
-        #   # Get today's date in seconds
-        #   NOW=$(date +%s)
-
-        #   # Parse and delete versions older than CLEANUP_AFTER days with dev or rc in the name
-        #   jq -c '.[] | select(.metadata.container.tags | index("dev") or index("rc"))' versions.json | while IFS= read -r version; do
-        #     VERSION_ID=$(echo "$version" | jq -r '.id')
-        #     CREATED_AT=$(echo "$version" | jq -r '.created_at')
-        #     VERSION_NAME=$(echo "$version" | jq -r '.name')
-        #     # Convert created_at to seconds
-        #     CREATED_AT_SEC=$(date --date="$CREATED_AT" +%s)
-        #     AGE_DAYS=$(( (NOW - CREATED_AT_SEC) / 86400 ))
-        #     if [ "$AGE_DAYS" -gt "$CLEANUP_AFTER" ]; then
-        #       echo "Deleting $VERSION_NAME (ID: $VERSION_ID, Age: $AGE_DAYS days)"
-        #       gh api --method DELETE /users/$OWNER/packages/npm/${PACKAGE_NAME}/versions/$VERSION_ID
-        #     fi
-        #   done
         run: |
-          # Get all versions with dev or rc in the version string
+          ENCODED_PACKAGE_NAME=$(echo -n "$PACKAGE_NAME" | jq -s -R -r @uri)
           gh api -H "Accept: application/vnd.github+json" \
-            /users/$OWNER/packages/npm/${PACKAGE_NAME}/versions \
+            /users/$OWNER/packages/npm/$ENCODED_PACKAGE_NAME/versions \
             --paginate > versions.json
 
-          # Get today's date in seconds
           NOW=$(date +%s)
 
-          # Parse and delete versions older than CLEANUP_AFTER hours with dev or rc in the name
           jq -c '.[] | select(.metadata.container.tags | index("dev") or index("rc"))' versions.json | while IFS= read -r version; do
             VERSION_ID=$(echo "$version" | jq -r '.id')
             CREATED_AT=$(echo "$version" | jq -r '.created_at')
             VERSION_NAME=$(echo "$version" | jq -r '.name')
-            # Convert created_at to seconds
             CREATED_AT_SEC=$(date --date="$CREATED_AT" +%s)
             AGE_HOURS=$(( (NOW - CREATED_AT_SEC) / 3600 ))
             if [ "$AGE_HOURS" -gt "$CLEANUP_AFTER" ]; then
               echo "Deleting $VERSION_NAME (ID: $VERSION_ID, Age: $AGE_HOURS hours)"
-              gh api --method DELETE /users/$OWNER/packages/npm/${PACKAGE_NAME}/versions/$VERSION_ID
+              gh api --method DELETE /users/$OWNER/packages/npm/$ENCODED_PACKAGE_NAME/versions/$VERSION_ID
             fi
           done
