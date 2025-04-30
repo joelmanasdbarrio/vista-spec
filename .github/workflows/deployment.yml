@@ -6,10 +6,10 @@ permissions:
 
 on:
   pull_request:
-    branches: [dev, release]
+    branches: [dev]
     types: [opened, synchronize, reopened]
   push:
-    branches: [main]
+    branches: [main, release]
 
 jobs:
   validate-specification:
@@ -24,7 +24,6 @@ jobs:
         name: Validate OpenAPI spec
 
   check-version:
-    needs: validate-specification
     if: github.event_name == 'pull_request'
     runs-on: ubuntu-latest
     outputs:
@@ -116,7 +115,7 @@ jobs:
 
   publish-package-release:
     needs: [generate-types, check-version]
-    if: github.event.action != 'closed' && (github.base_ref == 'release')
+    if: github.ref == 'release'
     runs-on: ubuntu-latest
     env:
       NODE_AUTH_TOKEN: ${{ secrets.DEPLOYMENT_TOKEN }}
@@ -126,6 +125,7 @@ jobs:
         with:
           node-version: 20
           registry-url: https://npm.pkg.github.com
+      - run: npm ci
       - name: Calculate version
         id: version
         run: |
@@ -137,27 +137,13 @@ jobs:
         run: |
           npm version $VERSION --no-git-tag-version
           npm publish --tag rc --access public
+      - name: Add job summary
+        run: |
+          echo "✅ Published **release** candidate version as `@joelmanasdbarrio/vista-spec@${{ steps.version.outputs.new_version }}`." >> $GITHUB_STEP_SUMMARY
 
-      - name: Comment on PR with result
-        if: success()
-        uses: peter-evans/create-or-update-comment@v2
-        with:
-          token: ${{ secrets.DEPLOYMENT_TOKEN }}
-          issue-number: ${{ github.event.pull_request.number }}
-          body: |
-            ✅ Published **release** candidate version as `@joelmanasdbarrio/vista-spec@${{ steps.version.outputs.new_version }}`.
-
-      - name: Comment on PR with error
-        if: failure()
-        uses: peter-evans/create-or-update-comment@v2
-        with:
-          token: ${{ secrets.DEPLOYMENT_TOKEN }}
-          issue-number: ${{ github.event.pull_request.number }}
-          body: |
-            ❌ Error on publication. Review workflow logs for more information.
 
   publish-package-main:
-    needs: generate-types
+    needs: [generate-types, check-version]
     if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     env:
@@ -169,14 +155,17 @@ jobs:
           node-version: 20
           registry-url: https://npm.pkg.github.com
       - run: npm ci
-      - name: Get package info
-        id: package-info
+      - name: Calculate version
+        id: version
         run: |
-          echo "package_name=$(node -p "require('./package.json').name")" >> $GITHUB_OUTPUT
-          echo "package_version=$(node -p "require('./package.json').version")" >> $GITHUB_OUTPUT
-      - run: |
+          BASE_VERSION=${{ needs.check-version.outputs.base_version }}
+          VERSION=${BASE_VERSION}
+          echo "VERSION=$VERSION" >> $GITHUB_ENV
+          echo "new_version=$VERSION" >> $GITHUB_OUTPUT
+      - name: Publish package
+        run: |
           npm version $VERSION --no-git-tag-version
           npm publish --tag latest --access public
       - name: Add job summary
         run: |
-          echo "✅ Published `main` version as **${{ steps.package-info.outputs.package_name }}@${{ steps.package-info.outputs.package_version }}** (`latest`)." >> $GITHUB_STEP_SUMMARY
+          echo "✅ Published **main** version as `@joelmanasdbarrio/vista-spec@${{ steps.version.outputs.package_version }}`." >> $GITHUB_STEP_SUMMARY
