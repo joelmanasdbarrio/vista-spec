@@ -13,21 +13,27 @@ This package is published to a private registry of GitHub Packages. To be able t
 
 Install all dependencies:
 
-`npm ci`
+```
+npm ci
+```
 
 Generate TypeScript interfaces:
 
-`npm run generate:types`
+```
+npm run generate:types
+```
 
 Validate specification:
 
-`npm run validate`
+```
+npm run validate
+```
 
 ## Versions
 
 The `@joelmanasdbarrio/vista-spec` package leverages semantic versioning and dist-tags from NPM to publish new packages. Packages published from:
 
-> ⚠️ Package and specification version must remain the same to avoid inconsistencies.
+> ⛔ Package and specification version must remain the same to avoid inconsistencies.
 
 - `dev`: `1.3.0-dev.N` in `dev` tag (experimental), where `N` is the commit number.From a `feature` branch, create a new merge-request into `dev` once the implementation is finished to trigger the GitHub workflow that validates and publishes a new experimental version of the package. Developers can commit as many changes as they need without having to update the final version of the package/specification while having an active merge-request since it will autoincrement its value based on the commit number on each run.
     <details>
@@ -95,11 +101,13 @@ For example `1.2.3`:
 | `npm version prerelease --preid=dev` | Upgrades `1.2.3` → `1.2.4-dev.0` (prerelease with suffix) |
 | `npm version prepatch --preid=beta` | Upgrades `1.2.3` → `1.2.4-beta.0` |
 
-## Deployment
+## Workflows
 
-### Pipelines
+They are stored inside `.github/workflows`.
 
-They are stored inside `.github/workflows` inside a single file called `deployment.yml`. This file runs all jobs in order:
+### Deployment
+
+`.github/workflows/deployment.yml`. This file runs all jobs in order:
 
 <details>
 <summary>validate-specification</summary>
@@ -191,9 +199,9 @@ generate-types:
 
 </details>
 <details>
-<summary>publish-package-[dev, release, main]</summary>
+<summary>publish-package-\[dev, release, main\]</summary>
 
-Creates and publishes a new version of the `@vista/vista-spec` package with a specific version, depending on the environment:
+Creates and publishes a new version of the `@joelmanasdbarrio/vista-spec` package with a specific version, depending on the environment:
 
 ```yaml
 publish-package-dev:
@@ -308,3 +316,7 @@ publish-package-main:
 Experimental and Release Candidate versions are autoincremented based on commit number to avoid version overrides.
 
 </details>
+
+### Clean up old packages
+
+Versions published with tags `dev` and `rc` are automatically removed after `CLEANUP_AFTER` days (view online value at [GitHub Actions variables](https://github.com/joelmanasdbarrio/vista-spec/settings/variables/actions)).
