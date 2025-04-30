@@ -103,7 +103,7 @@ jobs:
           token: ${{ secrets.DEPLOYMENT_TOKEN }}
           issue-number: ${{ github.event.pull_request.number }}
           body: |
-            ✅ Published `development` version as **@joelmanasdbarrio/vista-spec@${{ steps.version.outputs.new_version }}** (`dev`).
+            ✅ Published **development** version as `@joelmanasdbarrio/vista-spec@${{ steps.version.outputs.new_version }}`.
 
       - name: Comment on PR with error
         if: failure()
@@ -112,7 +112,7 @@ jobs:
           token: ${{ secrets.DEPLOYMENT_TOKEN }}
           issue-number: ${{ github.event.pull_request.number }}
           body: |
-            ❌ Error publishing `development` version. Review workflow logs for more information.
+            ❌ Error on publication. Review workflow logs for more information.
 
   publish-package-release:
     needs: [generate-types, check-version]
@@ -145,7 +145,7 @@ jobs:
           token: ${{ secrets.DEPLOYMENT_TOKEN }}
           issue-number: ${{ github.event.pull_request.number }}
           body: |
-            ✅ Published `release` candidate version as **@joelmanasdbarrio/vista-spec@${{ steps.version.outputs.new_version }}** (`rc`).
+            ✅ Published **release** candidate version as `@joelmanasdbarrio/vista-spec@${{ steps.version.outputs.new_version }}`.
 
       - name: Comment on PR with error
         if: failure()
@@ -154,7 +154,7 @@ jobs:
           token: ${{ secrets.DEPLOYMENT_TOKEN }}
           issue-number: ${{ github.event.pull_request.number }}
           body: |
-            ❌ Error publishing `release` version. Review workflow logs for more information.
+            ❌ Error on publication. Review workflow logs for more information.
 
   publish-package-main:
     needs: generate-types
