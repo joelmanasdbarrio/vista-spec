@@ -109,6 +109,23 @@ They are stored inside `.github/workflows`.
 
 `.github/workflows/deployment.yml`. This file runs all jobs in order:
 
+```yaml
+name: CI & Publish OpenAPI Package
+
+permissions:
+  contents: write
+  packages: write
+
+on:
+  pull_request:
+    branches: [main, release, dev]
+    types: [opened, synchronize, reopened]
+  push:
+    branches: [main]
+
+jobs:
+```
+
 <details>
 <summary>validate-specification</summary>
 
@@ -320,3 +337,57 @@ Experimental and Release Candidate versions are autoincremented based on commit 
 ### Clean up old packages
 
 Versions published with tags `dev` and `rc` are automatically removed after `CLEANUP_AFTER` days (view online value at [GitHub Actions variables](https://github.com/joelmanasdbarrio/vista-spec/settings/variables/actions)).
+
+<details>
+<summary>cleanup</summary>
+
+```yaml
+name: Clean up old dev/rc versions
+
+on:
+  schedule:
+    - cron: '0 6 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  packages: write
+
+env:
+  PACKAGE_TYPE: npm
+  PACKAGE_NAME: vista-spec
+  CLEANUP_AFTER: ${{ vars.CLEANUP_AFTER }}
+  GH_TOKEN: ${{ secrets.CLEANUP_TOKEN }}
+
+jobs:
+  cleanup:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Listar versiones
+        run: |
+          gh api \
+            -H "Accept: application/vnd.github+json" \
+            /user/packages/$PACKAGE_TYPE/$PACKAGE_NAME/versions \
+            --paginate > versions.json
+
+      - name: Eliminar versiones dev/rc antiguas
+        run: |
+          now=$(date +%s)
+          cutoff=$(( CLEANUP_AFTER * 86400 ))
+          jq -c '.[]' versions.json | while read pkg; do
+            name=$(jq -r .name <<<"$pkg")
+            created=$(jq -r .created_at <<<"$pkg")
+            created_ts=$(date -d "$created" +%s)
+            age=$(( now - created_ts ))
+            if [[ $age -gt $cutoff && "$name" =~ (dev|rc) ]]; then
+              id=$(jq -r .id <<<"$pkg")
+              days=$(( age / 86400 ))
+              echo "Deleting $name (id=$id), $days days old"
+              gh api --method DELETE \
+                -H "Accept: application/vnd.github+json" \
+                /user/packages/$PACKAGE_TYPE/$PACKAGE_NAME/versions/$id
+            fi
+          done
+```
+
+</details>
