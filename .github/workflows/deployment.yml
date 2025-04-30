@@ -93,6 +93,7 @@ jobs:
           echo "new_version=$VERSION" >> $GITHUB_OUTPUT
       - name: Publish package
         run: |
+          npm version $VERSION --no-git-tag-version
           npm publish --tag dev --access public
 
       - name: Comment on PR with result
@@ -134,6 +135,7 @@ jobs:
           echo "new_version=$VERSION" >> $GITHUB_OUTPUT
       - name: Publish package
         run: |
+          npm version $VERSION --no-git-tag-version
           npm publish --tag rc --access public
 
       - name: Comment on PR with result
@@ -172,7 +174,9 @@ jobs:
         run: |
           echo "package_name=$(node -p "require('./package.json').name")" >> $GITHUB_OUTPUT
           echo "package_version=$(node -p "require('./package.json').version")" >> $GITHUB_OUTPUT
-      - run: npm publish --tag latest --access public
+      - run: |
+          npm version $VERSION --no-git-tag-version
+          npm publish --tag latest --access public
       - name: Add job summary
         run: |
           echo "✅ Published `main` version as **${{ steps.package-info.outputs.package_name }}@${{ steps.package-info.outputs.package_version }}** (`latest`)." >> $GITHUB_STEP_SUMMARY
