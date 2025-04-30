@@ -1,45 +1,52 @@
 name: Cleanup old dev/rc package versions
 
+on:
+  schedule:
+    - cron:  '0 6 * * *'
+
 permissions:
   contents: read
   packages: write
 
-on:
-  schedule:
-    - cron: '0 6 * * *' # Every day at 6am UTC
-  workflow_dispatch:
-
 jobs:
   cleanup:
     runs-on: ubuntu-latest
+    env:
+      CLEANUP_AFTER: ${{ vars.CLEANUP_AFTER }}
+
     steps:
       - uses: actions/checkout@v4
-      - name: Get package name from package.json
+
+      - name: Read package name
         id: pkg
-        run: echo "PACKAGE_NAME=$(jq -r .name package.json)" >> $GITHUB_ENV
-      - name: List and delete old dev/rc versions
-        env:
-          GH_TOKEN: ${{ secrets.CLEANUP_TOKEN }}
-          OWNER: joelmanasdbarrio
-          REPO: vista-spec
-          CLEANUP_AFTER: ${{ vars.CLEANUP_AFTER }}
         run: |
-          set -e
-          ENCODED_PACKAGE_NAME=$(echo -n "$PACKAGE_NAME" | jq -s -R -r @uri)
-          gh api -H "Accept: application/vnd.github+json" \
-            /users/$OWNER/packages/npm/$ENCODED_PACKAGE_NAME/versions \
+          echo "::set-output name=name::$(jq -r .name package.json)"
+
+      - name: Encode package name for URL
+        id: enc
+        run: |
+          ENC=$(echo -n "${{ steps.pkg.outputs.name }}" | jq -s -R -r @uri)
+          echo "::set-output name=encoded::${ENC}"
+
+      - name: List all versions
+        run: |
+          gh api \
+            -H "Accept: application/vnd.github+json" \
+            /user/packages/npm/${{ steps.enc.outputs.encoded }}/versions \
             --paginate > versions.json
 
+      - name: Delete old “dev”/“rc” versions
+        run: |
           NOW=$(date +%s)
-
-          jq -c '.[] | select(.name | test("dev|rc"))' versions.json | while IFS= read -r version; do
-            VERSION_ID=$(echo "$version" | jq -r '.id')
-            VERSION_NAME=$(echo "$version" | jq -r '.name')
-            CREATED_AT=$(echo "$version" | jq -r '.created_at')
-            CREATED_AT_SEC=$(date --date="$CREATED_AT" +%s)
-            AGE_HOURS=$(( (NOW - CREATED_AT_SEC) / 3600 ))
-            if [ "$AGE_HOURS" -gt "$CLEANUP_AFTER" ]; then
-              echo "Deleting $VERSION_NAME (ID: $VERSION_ID, Age: $AGE_HOURS hours)"
-              gh api --method DELETE /users/$OWNER/packages/npm/$ENCODED_PACKAGE_NAME/versions/$VERSION_ID
-            fi
-          done
+          jq -c '.[] | select(.name | test("dev|rc"))' versions.json \
+          | while IFS= read -r v; do
+              ID=$(echo "$v" | jq -r .id)
+              NAME=$(echo "$v" | jq -r .name)
+              CREATED=$(echo "$v" | jq -r .created_at)
+              AGE=$(( (NOW - $(date --date="$CREATED" +%s)) / 3600 ))
+              if [ "$AGE" -gt "$CLEANUP_AFTER" ]; then
+                echo "Deleting $NAME (id $ID), age ${AGE}h"
+                gh api --method DELETE \
+                  /user/packages/npm/${{ steps.enc.outputs.encoded }}/versions/$ID
+              fi
+            done
