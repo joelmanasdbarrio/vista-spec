@@ -1,145 +1,186 @@
-name: Validate and publish OpenAPI specification
+name: CI & Publish OpenAPI Package
 
 permissions:
   contents: write
+  packages: write
 
 on:
-  push:
   pull_request:
+    branches: [main, release, dev]
+    types: [opened, synchronize, reopened]
+  push:
+    branches: [main]
 
 jobs:
   validate-specification:
+    if: github.event_name == 'pull_request'
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v3
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v4
         with:
-          persist-credentials: true
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: '18'
-          cache: 'npm'
-
-      - name: Install dependencies
-        run: npm ci
-
-      - name: Validate OpenAPI specification
-        run: npm run validate
+          node-version: 22
+          registry-url: https://npm.pkg.github.com
+      - run: npm ci
+      - run: npm run validate
+        name: Validate OpenAPI spec
 
   check-version:
+    if: github.event_name == 'pull_request'
     runs-on: ubuntu-latest
-    needs: validate-specification
+    outputs:
+      base_version: ${{ steps.pkg.outputs.version }}
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v3
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v4
         with:
-          persist-credentials: true
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: '18'
-          cache: 'npm'
-
-      - name: Install dependencies
-        run: npm ci
-
+          node-version: 22
+          registry-url: https://npm.pkg.github.com
+      - run: npm ci
       - name: Read package.json version
         id: pkg
         uses: ActionsTools/read-json-action@main
-        with:
-          file_path: package.json
-
+        with: { file_path: package.json }
       - name: Read OpenAPI info.version
         id: spec
         uses: actions-tools/yaml-outputs@v2.1
         with:
           file-path: openapi/openapi-rest.yaml
           separator: '__'
-
-      - name: Ensure versions match
-        run: |
-          pkg_ver="${{ steps.pkg.outputs.version }}"
-          spec_ver="${{ steps.spec.outputs.info__version }}"
-          echo "package.json version = $pkg_ver"
-          echo "OpenAPI info.version = $spec_ver"
-          if [ "$pkg_ver" != "$spec_ver" ]; then
-            echo "::error ::Version mismatch between package.json and OpenAPI spec"
+      - run: |
+          if [ "${{ steps.pkg.outputs.version }}" != "${{ steps.spec.outputs.info__version }}" ]; then
+            echo "::error ::Version mismatch: package.json (${{
+            steps.pkg.outputs.version }}) vs OpenAPI spec (${{
+            steps.spec.outputs.info__version }})"
             exit 1
           fi
+        name: Ensure versions match
 
   generate-types:
-    runs-on: ubuntu-latest
     needs: check-version
-
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v3
-        with:
-          persist-credentials: true
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: '18'
-          cache: 'npm'
-
-      - name: Install dependencies
-        run: npm ci
-
-      - name: Clean previous types
-        run: rm -rf types/
-
-      - name: Generate TypeScript types
-        run: npm run generate:types
-
-      - name: Commit and push generated types
-        uses: EndBug/add-and-commit@v9
-        with:
-          author_name: github-actions
-          author_email: github-actions@github.com
-          message: regenerate OpenAPI types
-
-  publish-package:
-    needs: generate-types
+    if: github.event_name == 'pull_request' && (github.base_ref == 'dev' || github.base_ref == 'release' || github.base_ref == 'main')
     runs-on: ubuntu-latest
-    if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/dev')
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v3
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v4
         with:
-          persist-credentials: true
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v3
+          node-version: 22
+          registry-url: https://npm.pkg.github.com
+      - run: npm ci
+      - run: rm -rf types/
+        name: Clean previous types
+      - run: npm run generate:types
+        name: Generate TS types
+      - uses: EndBug/add-and-commit@v9
         with:
-          node-version: '18'
-          registry-url: https://npm.pkg.github.com/
+          author_name: github-actions[bot]
+          author_email: 41898282+github-actions[bot]@users.noreply.github.com
+          message: "regenerate OpenAPI types"
 
-      - name: Install dependencies
-        run: npm ci
-
-      - name: Bump version
+  publish-package-dev:
+    needs: [generate-types, check-version]
+    if: github.event.action != 'closed' && (github.base_ref == 'dev' && startsWith(github.head_ref, 'feature/'))
+    runs-on: ubuntu-latest
+    env:
+      NODE_AUTH_TOKEN: ${{ secrets.DEPLOYMENT_TOKEN }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          registry-url: https://npm.pkg.github.com
+      - name: Calculate version
+        id: version
         run: |
-          BRANCH=${GITHUB_REF##*/}
-          if [ "$BRANCH" = "main" ]; then
-            # patch bump, crea commit y tag vX.Y.Z
-            npm version patch
-          else
-            # prerelease bump con sufijo "dev", e.g. 1.2.3 → 1.2.4-dev.0
-            npm version prerelease --preid=dev
-          fi
-        env:
-          CI: true
-
+          BASE_VERSION=${{ needs.check-version.outputs.base_version }}
+          VERSION=${BASE_VERSION}-dev.$GITHUB_RUN_NUMBER
+          echo "VERSION=$VERSION" >> $GITHUB_ENV
+          echo "new_version=$VERSION" >> $GITHUB_OUTPUT
       - name: Publish package
         run: |
-          if [ "$BRANCH" = "main" ]; then
-            npm publish --access=restricted
-          else
-            npm publish --access=restricted --tag=dev
-          fi
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          npm version $VERSION --no-git-tag-version
+          npm publish --tag dev --access public
+      - name: Comment on PR with result
+        if: success()
+        uses: peter-evans/create-or-update-comment@v2
+        with:
+          token: ${{ secrets.DEPLOYMENT_TOKEN }}
+          issue-number: ${{ github.event.pull_request.number }}
+          body: |
+            ✅ Published **development** version as `@joelmanasdbarrio/vista-spec@${{ steps.version.outputs.new_version }}`.
+      - name: Comment on PR with error
+        if: failure()
+        uses: peter-evans/create-or-update-comment@v2
+        with:
+          token: ${{ secrets.DEPLOYMENT_TOKEN }}
+          issue-number: ${{ github.event.pull_request.number }}
+          body: |
+            ❌ Error on publication. Review workflow logs for more information.
+
+  publish-package-release:
+    needs: [generate-types, check-version]
+    if: github.event.action != 'closed' && (github.base_ref == 'main' && startsWith(github.head_ref, 'release/'))
+    runs-on: ubuntu-latest
+    env:
+      NODE_AUTH_TOKEN: ${{ secrets.DEPLOYMENT_TOKEN }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          registry-url: https://npm.pkg.github.com
+      - name: Calculate version
+        id: version
+        run: |
+          BASE_VERSION=${{ needs.check-version.outputs.base_version }}
+          VERSION=${BASE_VERSION}-rc.$GITHUB_RUN_NUMBER
+          echo "VERSION=$VERSION" >> $GITHUB_ENV
+          echo "new_version=$VERSION" >> $GITHUB_OUTPUT
+      - name: Publish package
+        run: |
+          npm version $VERSION --no-git-tag-version
+          npm publish --tag rc --access public
+      - name: Comment on PR with result
+        if: success()
+        uses: peter-evans/create-or-update-comment@v2
+        with:
+          token: ${{ secrets.DEPLOYMENT_TOKEN }}
+          issue-number: ${{ github.event.pull_request.number }}
+          body: |
+            ✅ Published **release** candidate version as `@joelmanasdbarrio/vista-spec@${{ steps.version.outputs.new_version }}`.
+      - name: Comment on PR with error
+        if: failure()
+        uses: peter-evans/create-or-update-comment@v2
+        with:
+          token: ${{ secrets.DEPLOYMENT_TOKEN }}
+          issue-number: ${{ github.event.pull_request.number }}
+          body: |
+            ❌ Error on publication. Review workflow logs for more information.
+
+  publish-package-main:
+    needs: [generate-types, check-version]
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    env:
+      NODE_AUTH_TOKEN: ${{ secrets.DEPLOYMENT_TOKEN }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          registry-url: https://npm.pkg.github.com
+      - run: npm ci
+      - name: Calculate version
+        id: version
+        run: |
+          BASE_VERSION=${{ needs.check-version.outputs.base_version }}
+          VERSION=${BASE_VERSION}
+          echo "VERSION=$VERSION" >> $GITHUB_ENV
+          echo "new_version=$VERSION" >> $GITHUB_OUTPUT
+      - name: Publish package
+        run: |
+          npm version $VERSION --no-git-tag-version
+          npm publish --tag latest --access public
+      - name: Add job summary
+        run: |
+          echo "✅ Published **main** version as `@joelmanasdbarrio/vista-spec@${{ steps.version.outputs.package_version }}`." >> $GITHUB_STEP_SUMMARY

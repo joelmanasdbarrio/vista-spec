@@ -1,12 +1,11 @@
 {
-  "name": "@vista/vista-spec",
+  "name": "@joelmanasdbarrio/vista-spec",
   "author": {
     "name": "Joel Mañas del Barrio",
     "email": "joelmanasdbarrio@gmail.com",
     "url": "https://www.linkedin.com/in/joel-ma%C3%B1as-del-barrio/"
   },
   "version": "1.0.0",
-  "private": true,
   "main": "openapi/openapi-rest.yaml",
   "types": "types/index.d.ts",
   "files": [
@@ -19,5 +18,13 @@
   },
   "devDependencies": {
     "openapi-typescript": "^7.6.1"
+  },
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com/",
+    "access": "restricted"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/joelmanasdbarrio/vista-spec.git"
   }
 }
