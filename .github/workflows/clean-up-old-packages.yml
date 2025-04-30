@@ -1,54 +1,45 @@
-name: Cleanup old dev/rc package versions
+name: Clean up old dev/rc versions
 
 on:
   schedule:
-    - cron:  '0 6 * * *'
+    - cron: '0 6 * * *'
   workflow_dispatch:
 
 permissions:
   contents: read
   packages: write
 
+env:
+  PACKAGE_TYPE: npm
+  PACKAGE_NAME: vista-spec
+  CLEANUP_AFTER: ${{ vars.CLEANUP_AFTER }}
+  GH_TOKEN: ${{ secrets.CLEANUP_TOKEN }}
+
 jobs:
   cleanup:
     runs-on: ubuntu-latest
-    env:
-      GH_TOKEN: ${{ secrets.CLEANUP_TOKEN }}
-      CLEANUP_AFTER: ${{ vars.CLEANUP_AFTER }}
-
     steps:
-      - uses: actions/checkout@v4
-
-      - name: Read package name
-        id: pkg
+      - name: Listar versiones
         run: |
-          echo "::set-output name=name::$(jq -r .name package.json)"
-
-      - name: Encode package name for URL
-        id: enc
-        run: |
-          ENC=$(echo -n "${{ steps.pkg.outputs.name }}" | jq -s -R -r @uri)
-          echo "::set-output name=encoded::${ENC}"
-
-      - name: List all versions
-        run: |
-          gh api --method GET \
+          gh api \
             -H "Accept: application/vnd.github+json" \
-            /user/packages/${{ steps.enc.outputs.encoded }}/versions \
+            /user/packages/$PACKAGE_TYPE/$PACKAGE_NAME/versions \
             --paginate > versions.json
 
-      - name: Delete old “dev”/“rc” versions
+      - name: Eliminar versiones dev/rc antiguas
         run: |
-          NOW=$(date +%s)
-          jq -c '.[] | select(.name | test("dev|rc"))' versions.json \
-          | while IFS= read -r v; do
-              ID=$(echo "$v" | jq -r .id)
-              NAME=$(echo "$v" | jq -r .name)
-              CREATED=$(echo "$v" | jq -r .created_at)
-              AGE=$(( (NOW - $(date --date="$CREATED" +%s)) / 3600 ))
-              if [ "$AGE" -gt "$CLEANUP_AFTER" ]; then
-                echo "Deleting $NAME (id $ID), age ${AGE}h"
-                gh api --method DELETE \
-                  /user/packages/${{ steps.enc.outputs.encoded }}/versions/$ID
-              fi
-            done
+          now=$(date +%s)
+          cutoff=$(( CLEANUP_AFTER * 3600 ))
+          jq -c '.[]' versions.json | while read pkg; do
+            name=$(jq -r .name <<<"$pkg")
+            created=$(jq -r .created_at <<<"$pkg")
+            created_ts=$(date -d "$created" +%s)
+            age=$(( now - created_ts ))
+            if [[ $age -gt $cutoff && "$name" =~ (dev|rc) ]]; then
+              id=$(jq -r .id <<<"$pkg")
+              echo "Deleting $name (id=$id), $(( age / 3600 ))h old"
+              gh api --method DELETE \
+                -H "Accept: application/vnd.github+json" \
+                /user/packages/$PACKAGE_TYPE/$PACKAGE_NAME/versions/$id
+            fi
+          done
