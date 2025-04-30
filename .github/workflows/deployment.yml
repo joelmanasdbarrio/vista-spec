@@ -6,15 +6,10 @@ permissions:
 
 on:
   pull_request:
-    branches:
-      - dev
-      - release
-      - main
-    types:
-      - opened
-      - synchronize
-      - reopened
-      - closed
+    branches: [dev, release]
+    types: [opened, synchronize, reopened]
+  push:
+    branches: [main]
 
 jobs:
   validate-specification:
@@ -76,89 +71,79 @@ jobs:
           message: "regenerate OpenAPI types"
 
   publish-package:
-    permissions:
-      contents: write           # Necesario para git commit/tag/push
-      packages: write           # Necesario para npm publish en GitHub Packages
-      issues: write             # Necesario para comentar en PRs
-      pull-requests: write      # Necesario para comentar en pull requests
     needs: generate-types
+    if: github.event.action != 'closed' && (github.base_ref == 'dev' || github.base_ref == 'release')
     runs-on: ubuntu-latest
-    if: >
-      github.event.pull_request.base.ref == 'dev' ||
-      github.event.pull_request.base.ref == 'release' ||
-      (github.event.pull_request.base.ref == 'main' && github.event.pull_request.merged == true)
-
+    env:
+      NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     steps:
-      - name: Checkout repository (with full history + tags)
-        uses: actions/checkout@v3
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
         with:
-          persist-credentials: true
-          fetch-depth: 0
-          fetch-tags: true
-
-      - name: Setup Node.js for GitHub Packages
-        uses: actions/setup-node@v3
-        with:
-          node-version: '18'
-          registry-url: 'https://npm.pkg.github.com/'
-          scope: '@joelmanasdbarrio'
-
-      - name: Install dependencies
-        run: npm ci
-
-      - name: Configure Git author
+          node-version: 20
+          registry-url: https://npm.pkg.github.com
+      - name: Get package scope
+        id: scope
         run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-
-      - name: Determine version and tag
-        id: ver
+          SCOPE=$(node -p "require('./package.json').name.split('/')[0]")
+          echo "scope=${SCOPE}" >> $GITHUB_OUTPUT
+      - name: Calculate version
+        id: version
         run: |
-          BRANCH="${GITHUB_BASE_REF:-${GITHUB_REF##*/}}"
-          echo "PR base branch = $BRANCH"
-
-          if [ "$BRANCH" = "dev" ]; then
-            # prerelease dev
-            NEW=$(npm version prerelease --preid=dev)
-            TAG=dev
-
-          elif [ "$BRANCH" = "release" ]; then
-            # release candidate
-            CURRENT=$(npm pkg get version | sed 's/"//g')
-            NEW="$CURRENT-rc"
-            npm version "$NEW" --force
-            TAG=rc
-
+          BASE_VERSION=${{ needs.check-version.outputs.base_version }}
+          if [ "${{ github.base_ref }}" == "dev" ]; then
+            echo "VERSION=${BASE_VERSION}-dev.$GITHUB_RUN_NUMBER" >> $GITHUB_ENV
+            echo "TAG=dev" >> $GITHUB_ENV
           else
-            # release stable
-            NEW=$(npm version patch)
-            TAG=latest
+            echo "VERSION=${BASE_VERSION}-rc" >> $GITHUB_ENV
+            echo "TAG=rc" >> $GITHUB_ENV
           fi
-
-          echo "new_version=$NEW" >> $GITHUB_OUTPUT
-          echo "dist_tag=$TAG"    >> $GITHUB_OUTPUT
-        env:
-          CI: true
-
-      - name: Authenticate to GitHub Packages
+      - name: Publish package
         run: |
-          echo "@joelmanasdbarrio:registry=https://npm.pkg.github.com/" >> ~/.npmrc
-          echo "//npm.pkg.github.com/:_authToken=${{ secrets.DEPLOYMENT_TOKEN }}" >> ~/.npmrc
-
-      - name: Publish to GitHub Packages
-        run: |
-          if [ "${{ steps.ver.outputs.dist_tag }}" = "latest" ]; then
-            npm publish
-          else
-            npm publish --tag "${{ steps.ver.outputs.dist_tag }}"
-          fi
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.DEPLOYMENT_TOKEN }}
-
-      - name: Comment on PR with result
-        uses: peter-evans/create-or-update-comment@v2
+          npm version $VERSION --no-git-tag-version
+          npm publish --tag $TAG --access public
+      - name: Notify PR
+        uses: peter-evans/create-or-update-comment@v3
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           issue-number: ${{ github.event.pull_request.number }}
           body: |
-            ✅ Publicado paquete **@joelmanasdbarrio/vista-spec@${{ steps.ver.outputs.new_version }}** con dist-tag `**${{ steps.ver.outputs.dist_tag }}**`.
+            🚀 Job `publish-package` - ${{ job.status == 'success' && '✅ Publicado' || '❌ Fallo' }}
+            Package: ${{ needs.check-version.outputs.package_name }}@${{ env.VERSION }}
+            Dist-tag: ${{ env.TAG }}
+            [Ver paquete](https://github.com/${{ github.repository }}/packages)
+
+  production-publish:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    env:
+      NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          registry-url: https://npm.pkg.github.com
+      - name: Get package info
+        id: package-info
+        run: |
+          echo "package_name=$(node -p "require('./package.json').name")" >> $GITHUB_OUTPUT
+          echo "package_version=$(node -p "require('./package.json').version")" >> $GITHUB_OUTPUT
+      - run: npm ci
+      - run: npm publish --tag latest --access public
+      - name: Notify release
+        uses: actions/github-script@v6
+        if: always()
+        with:
+          script: |
+            const { package_name, package_version } = process.env
+            github.rest.repos.createCommitComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              commit_sha: context.sha,
+              body: `🎉 Release publicado - ${process.env.JOB_STATUS}\nPackage: ${package_name}@${package_version}\nDist-tag: latest\n[Ver paquete](https://github.com/${context.repo.owner}/${context.repo.repo}/packages)`
+            })
+        env:
+          JOB_STATUS: ${{ job.status == 'success' && '✅ Éxito' || '❌ Fallo' }}
+          package_name: ${{ steps.package-info.outputs.package_name }}
+          package_version: ${{ steps.package-info.outputs.package_version }}
