@@ -26,7 +26,7 @@ jobs:
         name: Validate OpenAPI spec
 
   check-version:
-    if: github.event_name == 'pull_request'
+    if: github.event_name == 'pull_request' || github.event_name == 'push'
     runs-on: ubuntu-latest
     outputs:
       base_version: ${{ steps.pkg.outputs.version }}
@@ -58,7 +58,7 @@ jobs:
 
   generate-types:
     needs: check-version
-    if: github.event_name == 'pull_request' && (github.base_ref == 'dev' || github.base_ref == 'release' || github.base_ref == 'main')
+    if: (github.event_name == 'pull_request' && (github.base_ref == 'dev' || github.base_ref == 'release' || github.base_ref == 'main')) || (github.event_name == 'push' && github.ref == 'refs/heads/main')
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
