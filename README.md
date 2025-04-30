@@ -9,6 +9,20 @@ This package is published to a private registry of GitHub Packages. To be able t
 //npm.pkg.github.com/:_authToken=${NODE_AUTH_TOKEN}
 ```
 
+## Installation
+
+Install all dependencies:
+
+`npm ci`
+
+Generate TypeScript interfaces:
+
+`npm run generate:types`
+
+Validate specification:
+
+`npm run validate`
+
 ## Versions
 
 The `@joelmanasdbarrio/vista-spec` package leverages semantic versioning and dist-tags from NPM to publish new packages. Packages published from:
