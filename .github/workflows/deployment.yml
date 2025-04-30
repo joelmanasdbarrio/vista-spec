@@ -179,7 +179,6 @@ jobs:
           echo "new_version=$VERSION" >> $GITHUB_OUTPUT
       - name: Publish package
         run: |
-          npm version $VERSION --no-git-tag-version
           npm publish --tag latest --access public
       - name: Add job summary
         run: |
