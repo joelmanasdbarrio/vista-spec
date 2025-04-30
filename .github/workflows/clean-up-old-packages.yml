@@ -32,7 +32,7 @@ jobs:
 
       - name: List all versions
         run: |
-          gh api \
+          gh api --method GET \
             -H "Accept: application/vnd.github+json" \
             /user/packages/npm/${{ steps.enc.outputs.encoded }}/versions \
             --paginate > versions.json
