@@ -1,5 +1,9 @@
 name: Cleanup old dev/rc package versions
 
+permissions:
+  contents: read
+  packages: write
+
 on:
   schedule:
     - cron: '0 6 * * *' # Every day at 6am UTC
@@ -9,9 +13,12 @@ jobs:
   cleanup:
     runs-on: ubuntu-latest
     steps:
+      - name: Get package name from package.json
+        id: pkg
+        run: echo "PACKAGE_NAME=$(jq -r .name package.json)" >> $GITHUB_ENV
       - name: List and delete old dev/rc versions
         env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ secrets.CLEANUP_TOKEN }}
           PACKAGE_NAME: '@joelmanasdbarrio/vista-spec'
           OWNER: ${{ github.repository_owner }}
           CLEANUP_AFTER: ${{ vars.CLEANUP_AFTER }}
