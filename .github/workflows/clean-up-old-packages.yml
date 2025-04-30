@@ -1,0 +1,38 @@
+name: Cleanup old dev/rc package versions
+
+on:
+  schedule:
+    - cron: '0 6 * * *' # Every day at 6am UTC
+
+jobs:
+  cleanup:
+    runs-on: ubuntu-latest
+    steps:
+      - name: List and delete old dev/rc versions
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PACKAGE_NAME: '@joelmanasdbarrio/vista-spec'
+          OWNER: ${{ github.repository_owner }}
+          CLEANUP_AFTER: ${{ vars.CLEANUP_AFTER }}
+        run: |
+          # Get all versions with dev or rc in the version string
+          gh api -H "Accept: application/vnd.github+json" \
+            /orgs/$OWNER/packages/npm/${PACKAGE_NAME}/versions \
+            --paginate > versions.json
+
+          # Get today's date in seconds
+          NOW=$(date +%s)
+
+          # Parse and delete versions older than CLEANUP_AFTER days with dev or rc in the name
+          jq -c '.[] | select(.metadata.container.tags | index("dev") or index("rc"))' versions.json | while IFS= read -r version; do
+            VERSION_ID=$(echo "$version" | jq -r '.id')
+            CREATED_AT=$(echo "$version" | jq -r '.created_at')
+            VERSION_NAME=$(echo "$version" | jq -r '.name')
+            # Convert created_at to seconds
+            CREATED_AT_SEC=$(date --date="$CREATED_AT" +%s)
+            AGE_DAYS=$(( (NOW - CREATED_AT_SEC) / 86400 ))
+            if [ "$AGE_DAYS" -gt "$CLEANUP_AFTER" ]; then
+              echo "Deleting $VERSION_NAME (ID: $VERSION_ID, Age: $AGE_DAYS days)"
+              gh api --method DELETE /orgs/$OWNER/packages/npm/${PACKAGE_NAME}/versions/$VERSION_ID
+            fi
+          done
