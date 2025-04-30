@@ -27,6 +27,8 @@ jobs:
     needs: validate-specification
     if: github.event_name == 'pull_request'
     runs-on: ubuntu-latest
+    outputs:
+      base_version: ${{ steps.pkg.outputs.version }}
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-node@v3
