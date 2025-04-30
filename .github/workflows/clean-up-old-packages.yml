@@ -34,7 +34,7 @@ jobs:
         run: |
           gh api --method GET \
             -H "Accept: application/vnd.github+json" \
-            /user/packages/npm/${{ steps.enc.outputs.encoded }}/versions \
+            /repos/${{ github.repository }}/packages/npm/${{ steps.enc.outputs.encoded }}/versions \
             --paginate > versions.json
 
       - name: Delete old “dev”/“rc” versions
@@ -49,6 +49,6 @@ jobs:
               if [ "$AGE" -gt "$CLEANUP_AFTER" ]; then
                 echo "Deleting $NAME (id $ID), age ${AGE}h"
                 gh api --method DELETE \
-                  /user/packages/npm/${{ steps.enc.outputs.encoded }}/versions/$ID
+                  /repos/${{ github.repository }}/packages/npm/${{ steps.enc.outputs.encoded }}/versions/$id
               fi
             done
