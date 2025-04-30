@@ -70,9 +70,9 @@ jobs:
           author_email: 41898282+github-actions[bot]@users.noreply.github.com
           message: "regenerate OpenAPI types"
 
-  publish-package:
+  publish-package-dev:
     needs: generate-types
-    if: github.event.action != 'closed' && (github.base_ref == 'dev' || github.base_ref == 'release')
+    if: github.event.action != 'closed' && (github.base_ref == 'dev')
     runs-on: ubuntu-latest
     env:
       NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -82,38 +82,78 @@ jobs:
         with:
           node-version: 20
           registry-url: https://npm.pkg.github.com
-      - name: Get package scope
-        id: scope
-        run: |
-          SCOPE=$(node -p "require('./package.json').name.split('/')[0]")
-          echo "scope=${SCOPE}" >> $GITHUB_OUTPUT
       - name: Calculate version
         id: version
         run: |
           BASE_VERSION=${{ needs.check-version.outputs.base_version }}
-          if [ "${{ github.base_ref }}" == "dev" ]; then
-            echo "VERSION=${BASE_VERSION}-dev.$GITHUB_RUN_NUMBER" >> $GITHUB_ENV
-            echo "TAG=dev" >> $GITHUB_ENV
-          else
-            echo "VERSION=${BASE_VERSION}-rc" >> $GITHUB_ENV
-            echo "TAG=rc" >> $GITHUB_ENV
-          fi
+          VERSION=${BASE_VERSION}-dev.$GITHUB_RUN_NUMBER
+          echo "VERSION=$VERSION" >> $GITHUB_ENV
+          echo "new_version=$VERSION" >> $GITHUB_OUTPUT
       - name: Publish package
         run: |
-          npm version $VERSION --no-git-tag-version
-          npm publish --tag $TAG --access public
-      - name: Notify PR
-        uses: peter-evans/create-or-update-comment@v3
+          npm publish --tag dev --access public
+
+      - name: Comment on PR with result
+        if: success()
+        uses: peter-evans/create-or-update-comment@v2
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           issue-number: ${{ github.event.pull_request.number }}
           body: |
-            🚀 Job `publish-package` - ${{ job.status == 'success' && '✅ Publicado' || '❌ Fallo' }}
-            Package: ${{ needs.check-version.outputs.package_name }}@${{ env.VERSION }}
-            Dist-tag: ${{ env.TAG }}
-            [Ver paquete](https://github.com/${{ github.repository }}/packages)
+            ✅ Published `development` version as **@joelmanasdbarrio/vista-spec@${{ steps.version.outputs.new_version }}** (`dev`).
 
-  production-publish:
+      - name: Comment on PR with error
+        if: failure()
+        uses: peter-evans/create-or-update-comment@v2
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          issue-number: ${{ github.event.pull_request.number }}
+          body: |
+            ❌ Error publishing `development` version. Review workflow logs for more information.
+
+  publish-package-release:
+    needs: generate-types
+    if: github.event.action != 'closed' && (github.base_ref == 'release')
+    runs-on: ubuntu-latest
+    env:
+      NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          registry-url: https://npm.pkg.github.com
+      - name: Calculate version
+        id: version
+        run: |
+          BASE_VERSION=${{ needs.check-version.outputs.base_version }}
+          VERSION=${BASE_VERSION}-rc
+          echo "VERSION=$VERSION" >> $GITHUB_ENV
+          echo "new_version=$VERSION" >> $GITHUB_OUTPUT
+      - name: Publish package
+        run: |
+          npm publish --tag rc --access public
+
+      - name: Comment on PR with result
+        if: success()
+        uses: peter-evans/create-or-update-comment@v2
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          issue-number: ${{ github.event.pull_request.number }}
+          body: |
+            ✅ Published `release` candidate version as **@joelmanasdbarrio/vista-spec@${{ steps.version.outputs.new_version }}** (`rc`).
+
+      - name: Comment on PR with error
+        if: failure()
+        uses: peter-evans/create-or-update-comment@v2
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          issue-number: ${{ github.event.pull_request.number }}
+          body: |
+            ❌ Error publishing `release` version. Review workflow logs for more information.
+
+  publish-package-main:
+    needs: generate-types
     if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     env:
@@ -124,26 +164,13 @@ jobs:
         with:
           node-version: 20
           registry-url: https://npm.pkg.github.com
+      - run: npm ci
       - name: Get package info
         id: package-info
         run: |
           echo "package_name=$(node -p "require('./package.json').name")" >> $GITHUB_OUTPUT
           echo "package_version=$(node -p "require('./package.json').version")" >> $GITHUB_OUTPUT
-      - run: npm ci
       - run: npm publish --tag latest --access public
-      - name: Notify release
-        uses: actions/github-script@v6
-        if: always()
-        with:
-          script: |
-            const { package_name, package_version } = process.env
-            github.rest.repos.createCommitComment({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              commit_sha: context.sha,
-              body: `🎉 Release publicado - ${process.env.JOB_STATUS}\nPackage: ${package_name}@${package_version}\nDist-tag: latest\n[Ver paquete](https://github.com/${context.repo.owner}/${context.repo.repo}/packages)`
-            })
-        env:
-          JOB_STATUS: ${{ job.status == 'success' && '✅ Éxito' || '❌ Fallo' }}
-          package_name: ${{ steps.package-info.outputs.package_name }}
-          package_version: ${{ steps.package-info.outputs.package_version }}
+      - name: Add job summary
+        run: |
+          echo "✅ Published `main` version as **${{ steps.package-info.outputs.package_name }}@${{ steps.package-info.outputs.package_version }}** (`latest`)." >> $GITHUB_STEP_SUMMARY
