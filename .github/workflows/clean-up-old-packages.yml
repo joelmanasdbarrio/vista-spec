@@ -18,7 +18,7 @@ jobs:
         # run: |
         #   # Get all versions with dev or rc in the version string
         #   gh api -H "Accept: application/vnd.github+json" \
-        #     /orgs/$OWNER/packages/npm/${PACKAGE_NAME}/versions \
+        #     /users/$OWNER/packages/npm/${PACKAGE_NAME}/versions \
         #     --paginate > versions.json
 
         #   # Get today's date in seconds
@@ -34,13 +34,13 @@ jobs:
         #     AGE_DAYS=$(( (NOW - CREATED_AT_SEC) / 86400 ))
         #     if [ "$AGE_DAYS" -gt "$CLEANUP_AFTER" ]; then
         #       echo "Deleting $VERSION_NAME (ID: $VERSION_ID, Age: $AGE_DAYS days)"
-        #       gh api --method DELETE /orgs/$OWNER/packages/npm/${PACKAGE_NAME}/versions/$VERSION_ID
+        #       gh api --method DELETE /users/$OWNER/packages/npm/${PACKAGE_NAME}/versions/$VERSION_ID
         #     fi
         #   done
         run: |
           # Get all versions with dev or rc in the version string
           gh api -H "Accept: application/vnd.github+json" \
-            /orgs/$OWNER/packages/npm/${PACKAGE_NAME}/versions \
+            /users/$OWNER/packages/npm/${PACKAGE_NAME}/versions \
             --paginate > versions.json
 
           # Get today's date in seconds
@@ -56,6 +56,6 @@ jobs:
             AGE_HOURS=$(( (NOW - CREATED_AT_SEC) / 3600 ))
             if [ "$AGE_HOURS" -gt "$CLEANUP_AFTER" ]; then
               echo "Deleting $VERSION_NAME (ID: $VERSION_ID, Age: $AGE_HOURS hours)"
-              gh api --method DELETE /orgs/$OWNER/packages/npm/${PACKAGE_NAME}/versions/$VERSION_ID
+              gh api --method DELETE /users/$OWNER/packages/npm/${PACKAGE_NAME}/versions/$VERSION_ID
             fi
           done
