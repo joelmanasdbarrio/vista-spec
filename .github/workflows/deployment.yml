@@ -73,7 +73,7 @@ jobs:
           message: "regenerate OpenAPI types"
 
   publish-package-dev:
-    needs: generate-types
+    needs: [generate-types, check-version]
     if: github.event.action != 'closed' && (github.base_ref == 'dev')
     runs-on: ubuntu-latest
     env:
@@ -115,7 +115,7 @@ jobs:
             ❌ Error publishing `development` version. Review workflow logs for more information.
 
   publish-package-release:
-    needs: generate-types
+    needs: [generate-types, check-version]
     if: github.event.action != 'closed' && (github.base_ref == 'release')
     runs-on: ubuntu-latest
     env:
