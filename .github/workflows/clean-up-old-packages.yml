@@ -21,11 +21,12 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.CLEANUP_TOKEN }}
           OWNER: joelmanasdbarrio
+          REPO: vista-spec
           CLEANUP_AFTER: ${{ vars.CLEANUP_AFTER }}
         run: |
           ENCODED_PACKAGE_NAME=$(echo -n "$PACKAGE_NAME" | jq -s -R -r @uri)
           gh api -H "Accept: application/vnd.github+json" \
-            /users/$OWNER/packages/npm/$ENCODED_PACKAGE_NAME/versions \
+            /repos/$OWNER/$REPO/packages/npm/$ENCODED_PACKAGE_NAME/versions \
             --paginate > versions.json
 
           NOW=$(date +%s)
@@ -38,6 +39,6 @@ jobs:
             AGE_HOURS=$(( (NOW - CREATED_AT_SEC) / 3600 ))
             if [ "$AGE_HOURS" -gt "$CLEANUP_AFTER" ]; then
               echo "Deleting $VERSION_NAME (ID: $VERSION_ID, Age: $AGE_HOURS hours)"
-              gh api --method DELETE /users/$OWNER/packages/npm/$ENCODED_PACKAGE_NAME/versions/$VERSION_ID
+              gh api --method DELETE /repos/$OWNER/$REPO/packages/npm/$ENCODED_PACKAGE_NAME/versions/$VERSION_ID
             fi
           done
