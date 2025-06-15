@@ -1,65 +1,79 @@
-# 📜 Vista-spec
+It uses [OpenAPI/Swagger](https://swagger.io/specification/) to define the project's API specification and work as the single source of truth for all endpoints and data structures that Vista has.
 
-It uses OpenAPI/Swagger to define the project’s API specification and work as the single source of truth for all endpoints and data structures that _Vista_ has.
+This package is published to a private registry of GitHub Packages. To be able to access this private registry in your project, update your .npmrc file with the registry URL and a valid auth token:
 
-This package is published to a private registry of GitHub Packages. To be able to access this private registry in your project, update your `.npmrc` file with the registry URL and a valid auth token:
-
-```
+```bash
 @joelmanasdbarrio:registry=https://npm.pkg.github.com/
 //npm.pkg.github.com/:_authToken=${NODE_AUTH_TOKEN}
 ```
 
+> [!DANGER]
+> Replace `${NODE_AUTH_TOKEN}` with a valid PAT token (classic token) that has read/write permissions on the repository and packages.
+
+> [!DANGER]
+> Do NOT upload the `.npmrc` file with your token to the repository. If it's not already there, add this file to the `.gitignore` or use the `.npmrc` file from your personal folder.
+
 ## Installation
 
-Install all dependencies:
+<Steps>
 
-```
-npm ci
-```
+1. Install all dependencies:
+    ```bash
+    npm ci
+    ```
 
-Generate TypeScript interfaces:
+2. Validate specification:
+    ```bash
+    npm run validate
+    ```
+  
+3. Generate TypeScript interfaces:
+    ```bash
+    npm run generate:types
+    ```
 
-```
-npm run generate:types
-```
-
-Validate specification:
-
-```
-npm run validate
-```
+</Steps>
 
 ## Versions
 
 The `@joelmanasdbarrio/vista-spec` package leverages semantic versioning and dist-tags from NPM to publish new packages. Packages published from:
 
-> ⛔ Package and specification version must remain the same to avoid inconsistencies.
+> [!DANGER]
+> Package and specification version must remain the same to avoid inconsistencies.
 
-- `dev`: `1.3.0-dev.N` in `dev` tag (experimental), where `N` is the commit number.From a `feature` branch, create a new merge-request into `dev` once the implementation is finished to trigger the GitHub workflow that validates and publishes a new experimental version of the package. Developers can commit as many changes as they need without having to update the final version of the package/specification while having an active merge-request since it will autoincrement its value based on the commit number on each run.
+- `dev`: `1.3.0-dev.N` in `dev` tag (experimental), where `N` is the commit number. From a `feature` branch, create a new merge-request into `dev` once the implementation is finished to trigger the GitHub workflow that validates and publishes a new experimental version of the package. Developers can commit as many changes as they need without having to update the final version of the package/specification while having an active merge-request since it will autoincrement its value based on the commit number on each run.
     <details>
     <summary>Install experimental version</summary>
     
     Install latest experimental version:
     
-    `npm install @joelmanasdbarrio/vista-spec@dev`
+    ```bash
+    npm install @joelmanasdbarrio/vista-spec@dev
+    ```
     
     Install specific experimental version:
     
-    `npm install @joelmanasdbarrio/vista-spec@1.0.0-dev.N`
+    ```bash
+    npm install @joelmanasdbarrio/vista-spec@1.0.0-dev.N
+    ```
     
     </details>
     
-- `release`: `1.2.3-rc` in `rc` tag (release candidate).Combines multiple features into a single `release` branch. Create a new merge-request into `main` to trigger the GitHub workflow that validates and publishes a new release candidate version of the package. Developers can merge as many features as they need without having to update the final version of the package/specification while having an active merge-request since it will autoincrement its value based on the commit number on each run.
+- `release`: `1.2.3-rc` in `rc` tag (release candidate). Combines multiple features into a single `release` branch. Create a new merge-request into `main` to trigger the GitHub workflow that validates and publishes a new release candidate version of the package. Developers can merge as many features as they need without having to update the final version of the package/specification while having an active merge-request since it will autoincrement its value based on the commit number on each run.
     <details>
     <summary>Install release candidate version</summary>
     
     Install latest release candidate version:
     
-    `npm install @joelmanasdbarrio/vista-spec@rc`
+    ```bash
+    npm install @joelmanasdbarrio/vista-spec@rc
+    ```
     
     Install specific release candidate version:
     
-    `npm install @joelmanasdbarrio/vista-spec@1.0.0-rc.N`
+    ```bash
+    npm install @joelmanasdbarrio/vista-spec@1.0.0-rc.N
+    ```
     
     </details>
     
@@ -69,20 +83,26 @@ The `@joelmanasdbarrio/vista-spec` package leverages semantic versioning and dis
     
     Install latest stable version:
     
-    `npm install @joelmanasdbarrio/vista-spec@latest`
+    ```bash
+    npm install @joelmanasdbarrio/vista-spec@latest
+    ```
     
     or just
     
-    `npm install @joelmanasdbarrio/vista-spec`
+    ```bash
+    npm install @joelmanasdbarrio/vista-spec
+    ```
     
     Install specific stable version:
     
-    `npm install @joelmanasdbarrio/vista-spec@1.0.0`
+    ```bash
+    npm install @joelmanasdbarrio/vista-spec@1.0.0
+    ```
     
     </details>
     
 
-### Semantic Versioning
+### Semantic versioning
 
 NPM uses SemVer (Semantic Versioning) to define the values for its versions: MAJOR.MINOR.PATCH.
 
@@ -108,6 +128,23 @@ They are stored inside `.github/workflows`.
 ### Deployment
 
 `.github/workflows/deployment.yml`. This file runs all jobs in order:
+
+```yaml
+name: CI & Publish OpenAPI Package
+
+permissions:
+  contents: write
+  packages: write
+
+on:
+  pull_request:
+    branches: [main, release, dev]
+    types: [opened, synchronize, reopened]
+  push:
+    branches: [main]
+
+jobs:
+```
 
 <details>
 <summary>validate-specification</summary>
@@ -320,3 +357,57 @@ Experimental and Release Candidate versions are autoincremented based on commit 
 ### Clean up old packages
 
 Versions published with tags `dev` and `rc` are automatically removed after `CLEANUP_AFTER` days (view online value at [GitHub Actions variables](https://github.com/joelmanasdbarrio/vista-spec/settings/variables/actions)).
+
+<details>
+<summary>cleanup</summary>
+
+```yaml
+name: Clean up old dev/rc versions
+
+on:
+  schedule:
+    - cron: '0 6 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  packages: write
+
+env:
+  PACKAGE_TYPE: npm
+  PACKAGE_NAME: vista-spec
+  CLEANUP_AFTER: ${{ vars.CLEANUP_AFTER }}
+  GH_TOKEN: ${{ secrets.CLEANUP_TOKEN }}
+
+jobs:
+  cleanup:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Listar versiones
+        run: |
+          gh api \
+            -H "Accept: application/vnd.github+json" \
+            /user/packages/$PACKAGE_TYPE/$PACKAGE_NAME/versions \
+            --paginate > versions.json
+
+      - name: Eliminar versiones dev/rc antiguas
+        run: |
+          now=$(date +%s)
+          cutoff=$(( CLEANUP_AFTER * 86400 ))
+          jq -c '.[]' versions.json | while read pkg; do
+            name=$(jq -r .name <<<"$pkg")
+            created=$(jq -r .created_at <<<"$pkg")
+            created_ts=$(date -d "$created" +%s)
+            age=$(( now - created_ts ))
+            if [[ $age -gt $cutoff && "$name" =~ (dev|rc) ]]; then
+              id=$(jq -r .id <<<"$pkg")
+              days=$(( age / 86400 ))
+              echo "Deleting $name (id=$id), $days days old"
+              gh api --method DELETE \
+                -H "Accept: application/vnd.github+json" \
+                /user/packages/$PACKAGE_TYPE/$PACKAGE_NAME/versions/$id
+            fi
+          done
+```
+
+</details>

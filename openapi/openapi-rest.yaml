@@ -1,7 +1,7 @@
 openapi: 3.0.4
 info:
   title: Vista API
-  version: 1.0.0
+  version: 1.1.0
   contact:
     name: Joel Mañas del Barrio
     email: joelmanasdbarrio@gmail.com
@@ -10,18 +10,18 @@ info:
     url: 'http://www.apache.org/licenses/LICENSE-2.0.html'
   description: >
     API specification for **Vista** app
-externalDocs:
-  description: Find out more
-  url: http://example.com
+# externalDocs:
+#   description: Find out more
+#   url: http://example.com
 tags:
   - name: Accounts
     description: Account operations
   - name: Notifications
     description: Notification operations
-  - name: Establishments
-    description: Establishment operations
   - name: Activities
     description: Activity operations
+  - name: Establishments
+    description: Establishment operations
 servers:
   - url: 'http://localhost:8080/api/v1'
     description: Local server
@@ -224,6 +224,39 @@ paths:
           $ref: '#/components/responses/ForbiddenError'
         '500':
           $ref: '#/components/responses/InternalServerError'
+    patch:
+      tags:
+        - Accounts
+      summary: Update follow
+      operationId: updateFollow
+      description: Update follow relationship
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/accountIdParam'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FollowDTO'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FollowDTO'
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
     delete:
       tags:
         - Accounts
@@ -234,6 +267,114 @@ paths:
         - bearerAuth: []
       parameters:
         - $ref: '#/components/parameters/accountIdParam'
+      responses:
+        '204':
+          description: No Content
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /follow-requests:
+    get:
+      tags:
+        - Accounts
+      summary: Get follow requests
+      operationId: getFollowRequests
+      description: Get all follow requests
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/FollowRequestDTO'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    post:
+      tags:
+        - Accounts
+      summary: Create follow request
+      operationId: createFollowRequest
+      description: Create follow request
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FollowRequestDTO'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FollowRequestDTO'
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /follow-requests/{id}:
+    patch:
+      tags:
+        - Accounts
+      summary: Update follow request
+      operationId: updateFollowRequest
+      description: Update one follow request
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/followRequestIdParam'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FollowRequestDTO'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FollowRequestDTO'
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    delete:
+      tags:
+        - Accounts
+      summary: Delete follow request
+      operationId: deleteFollowRequest
+      description: Delete one follow request
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/followRequestIdParam'
       responses:
         '204':
           description: No Content
@@ -293,250 +434,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/NotificationDTO'
-        '401':
-          $ref: '#/components/responses/UnauthorizedError'
-        '404':
-          $ref: '#/components/responses/NotFoundError'
-        '403':
-          $ref: '#/components/responses/ForbiddenError'
-        '500':
-          $ref: '#/components/responses/InternalServerError'
-  /establishments:
-    get:
-      tags:
-        - Establishments
-      summary: Get establishments
-      operationId: getEstablishments
-      description: Get all establishments
-      security:
-        - bearerAuth: []
-      parameters:
-        - $ref: '#/components/parameters/establishmentNameParam'
-        - $ref: '#/components/parameters/establishmentAddressParam'
-      responses:
-        '200':
-          description: OK
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/EstablishmentDTO'
-        '401':
-          $ref: '#/components/responses/UnauthorizedError'
-        '403':
-          $ref: '#/components/responses/ForbiddenError'
-        '500':
-          $ref: '#/components/responses/InternalServerError'
-    post:
-      tags:
-        - Establishments
-      summary: Create establishment
-      operationId: createEstablishment
-      description: Create establishment
-      security:
-        - bearerAuth: []
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/EstablishmentDTO'
-      responses:
-        '201':
-          description: Created
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/EstablishmentDTO'
-        '400':
-          $ref: '#/components/responses/BadRequestError'
-        '401':
-          $ref: '#/components/responses/UnauthorizedError'
-        '403':
-          $ref: '#/components/responses/ForbiddenError'
-        '500':
-          $ref: '#/components/responses/InternalServerError'
-  /establishments/{id}:
-    get:
-      tags:
-        - Establishments
-      summary: Get establishment
-      operationId: getEstablishment
-      description: Get one establishment
-      security:
-        - bearerAuth: []
-      parameters:
-        - $ref: '#/components/parameters/establishmentIdParam'
-      responses:
-        '200':
-          description: OK
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/EstablishmentDTO'
-        '401':
-          $ref: '#/components/responses/UnauthorizedError'
-        '404':
-          $ref: '#/components/responses/NotFoundError'
-        '403':
-          $ref: '#/components/responses/ForbiddenError'
-        '500':
-          $ref: '#/components/responses/InternalServerError'
-    patch:
-      tags:
-        - Establishments
-      summary: Update establishment
-      operationId: updateEstablishment
-      description: Update one establishment
-      security:
-        - bearerAuth: []
-      parameters:
-        - $ref: '#/components/parameters/establishmentIdParam'
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/EstablishmentDTO'
-      responses:
-        '200':
-          description: OK
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/EstablishmentDTO'
-        '400':
-          $ref: '#/components/responses/BadRequestError'
-        '401':
-          $ref: '#/components/responses/UnauthorizedError'
-        '404':
-          $ref: '#/components/responses/NotFoundError'
-        '403':
-          $ref: '#/components/responses/ForbiddenError'
-        '500':
-          $ref: '#/components/responses/InternalServerError'
-    delete:
-      tags:
-        - Establishments
-      summary: Delete establishment
-      operationId: deleteEstablishment
-      description: Delete one establishment
-      security:
-        - bearerAuth: []
-      parameters:
-        - $ref: '#/components/parameters/establishmentIdParam'
-      responses:
-        '204':
-          description: No Content
-        '401':
-          $ref: '#/components/responses/UnauthorizedError'
-        '404':
-          $ref: '#/components/responses/NotFoundError'
-        '403':
-          $ref: '#/components/responses/ForbiddenError'
-        '500':
-          $ref: '#/components/responses/InternalServerError'
-  /establishments/requests:
-    get:
-      tags:
-        - Establishments
-      summary: Get establishment requests
-      operationId: getEstablishmentRequests
-      description: Get all establishment requests
-      security:
-        - bearerAuth: []
-      responses:
-        '200':
-          description: OK
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/EstablishmentRequestDTO'
-        '401':
-          $ref: '#/components/responses/UnauthorizedError'
-        '403':
-          $ref: '#/components/responses/ForbiddenError'
-        '500':
-          $ref: '#/components/responses/InternalServerError'
-    post:
-      tags:
-        - Establishments
-      summary: Create establishment request
-      operationId: createEstablishmentRequest
-      description: Create establishment request
-      security:
-        - bearerAuth: []
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/EstablishmentRequestDTO'
-      responses:
-        '201':
-          description: Created
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/EstablishmentRequestDTO'
-        '400':
-          $ref: '#/components/responses/BadRequestError'
-        '401':
-          $ref: '#/components/responses/UnauthorizedError'
-        '403':
-          $ref: '#/components/responses/ForbiddenError'
-        '500':
-          $ref: '#/components/responses/InternalServerError'
-  /establishments/requests/{id}:
-    patch:
-      tags:
-        - Establishments
-      summary: Update establishment request
-      operationId: updateEstablishmentRequest
-      description: Update one establishment request
-      security:
-        - bearerAuth: []
-      parameters:
-        - $ref: '#/components/parameters/establishmentRequestIdParam'
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/EstablishmentRequestDTO'
-      responses:
-        '200':
-          description: OK
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/EstablishmentRequestDTO'
-        '400':
-          $ref: '#/components/responses/BadRequestError'
-        '401':
-          $ref: '#/components/responses/UnauthorizedError'
-        '404':
-          $ref: '#/components/responses/NotFoundError'
-        '403':
-          $ref: '#/components/responses/ForbiddenError'
-        '500':
-          $ref: '#/components/responses/InternalServerError'
-    delete:
-      tags:
-        - Establishments
-      summary: Delete establishment request
-      operationId: deleteEstablishmentRequest
-      description: Delete one establishment request
-      security:
-        - bearerAuth: []
-      parameters:
-        - $ref: '#/components/parameters/establishmentRequestIdParam'
-      responses:
-        '204':
-          description: No Content
         '401':
           $ref: '#/components/responses/UnauthorizedError'
         '404':
@@ -792,39 +689,293 @@ paths:
           $ref: '#/components/responses/ForbiddenError'
         '500':
           $ref: '#/components/responses/InternalServerError'
+  /establishments:
+    get:
+      tags:
+        - Establishments
+      summary: Get establishments
+      operationId: getEstablishments
+      description: Get all establishments
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/establishmentNameParam'
+        - $ref: '#/components/parameters/establishmentAddressParam'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/EstablishmentDTO'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    post:
+      tags:
+        - Establishments
+      summary: Create establishment
+      operationId: createEstablishment
+      description: Create establishment
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EstablishmentDTO'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EstablishmentDTO'
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /establishments/{id}:
+    get:
+      tags:
+        - Establishments
+      summary: Get establishment
+      operationId: getEstablishment
+      description: Get one establishment
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/establishmentIdParam'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EstablishmentDTO'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    patch:
+      tags:
+        - Establishments
+      summary: Update establishment
+      operationId: updateEstablishment
+      description: Update one establishment
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/establishmentIdParam'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EstablishmentDTO'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EstablishmentDTO'
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    delete:
+      tags:
+        - Establishments
+      summary: Delete establishment
+      operationId: deleteEstablishment
+      description: Delete one establishment
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/establishmentIdParam'
+      responses:
+        '204':
+          description: No Content
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /establishments/requests:
+    get:
+      tags:
+        - Establishments
+      summary: Get establishment requests
+      operationId: getEstablishmentRequests
+      description: Get all establishment requests
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/EstablishmentRequestDTO'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    post:
+      tags:
+        - Establishments
+      summary: Create establishment request
+      operationId: createEstablishmentRequest
+      description: Create establishment request
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EstablishmentRequestDTO'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EstablishmentRequestDTO'
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /establishments/requests/{id}:
+    patch:
+      tags:
+        - Establishments
+      summary: Update establishment request
+      operationId: updateEstablishmentRequest
+      description: Update one establishment request
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/establishmentRequestIdParam'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EstablishmentRequestDTO'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EstablishmentRequestDTO'
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    delete:
+      tags:
+        - Establishments
+      summary: Delete establishment request
+      operationId: deleteEstablishmentRequest
+      description: Delete one establishment request
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/establishmentRequestIdParam'
+      responses:
+        '204':
+          description: No Content
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
 components:
   schemas:
     AccountDTO:
       oneOf:
-        - $ref: '#/components/schemas/PersonalAccountDTO'
-        - $ref: '#/components/schemas/EnterpriseAccountDTO'
+        - $ref: '#/components/schemas/AccountPersonalDTO'
+        - $ref: '#/components/schemas/AccountEnterpriseDTO'
       discriminator:
         propertyName: type
-    PersonalAccountDTO:
+    AccountPersonalDTO:
       allOf:
         - $ref: '#/components/schemas/AccountBase'
       type: object
       required:
+        - gender
         - type
       properties:
+        gender:
+          type: string
+          enum:
+            - male
+            - female
+            - other
+          default: other
         type:
           type: string
           enum:
             - personal
-    EnterpriseAccountDTO:
+          default: personal
+    AccountEnterpriseDTO:
       allOf:
         - $ref: '#/components/schemas/AccountBase'
       type: object
       required:
         - type
       properties:
-        verified:
+        isVerified:
           type: boolean
           default: false
         type:
           type: string
           enum:
             - enterprise
+          default: enterprise
     AccountBase:
       type: object
       required:
@@ -842,7 +993,7 @@ components:
           pattern: '(^[a-zA-Zñ\s]+$)'
         username:
           type: string
-          minLength: 4
+          minLength: 3
           maxLength: 30
           pattern: '(^[a-z_0-9]+$)'
         email:
@@ -854,24 +1005,63 @@ components:
           type: string
         website:
           type: string
-        private:
+        isPrivate:
           type: boolean
           default: false
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
     FollowDTO:
       type: object
       required:
-        - id
         - follower
         - following
+        - isMuted
       properties:
         id:
           type: string
           format: uuid
         follower:
-          $ref: '#/components/schemas/PersonalAccountDTO'
+          $ref: '#/components/schemas/AccountPersonalDTO'
         following:
           $ref: '#/components/schemas/AccountDTO'
+        isMuted:
+          type: boolean
+          default: true
         createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+    FollowRequestDTO:
+      type: object
+      required:
+        - requestFrom
+        - requestTo
+        - status
+      properties:
+        id:
+          type: string
+          format: uuid
+        requestFrom:
+          $ref: '#/components/schemas/AccountPersonalDTO'
+        requestTo:
+          $ref: '#/components/schemas/AccountDTO'
+        status:
+          type: string
+          enum:
+            - pending
+            - approved
+            - rejected
+          default: pending
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
           type: string
           format: date-time
     NotificationDTO:
@@ -879,8 +1069,9 @@ components:
       required:
         - id
         - type
-        - account
-        - read
+        - content
+        - isRead
+        - owner
         - createdAt
       properties:
         id:
@@ -893,6 +1084,8 @@ components:
             - entry
             - activity
             - system
+        content:
+          type: string
         isRead:
           type: boolean
           default: false
@@ -905,48 +1098,7 @@ components:
         createdAt:
           type: string
           format: date-time
-    EstablishmentDTO:
-      type: object
-      required:
-        - owner
-        - address
-        - name
-      properties:
-        id:
-          type: string
-          format: uuid
-        owner:
-          $ref: '#/components/schemas/EnterpriseAccountDTO'
-        address:
-          $ref: '#/components/schemas/AddressDTO'
-        name:
-          type: string
-        createdAt:
-          type: string
-          format: date-time
-    EstablishmentRequestDTO:
-      type: object
-      required:
-        - owner
-        - establishment
-        - account
-      properties:
-        id:
-          type: string
-          format: uuid
-        owner:
-          $ref: '#/components/schemas/EnterpriseAccountDTO'
-        relatedAccount:
-          $ref: '#/components/schemas/EnterpriseAccountDTO'
-        relatedEstablishment:
-          $ref: '#/components/schemas/EstablishmentDTO'
-        status:
-          type: string
-          enum:
-            - pending
-            - accepted
-            - rejected
-        createdAt:
+        updatedAt:
           type: string
           format: date-time
     AddressDTO:
@@ -973,6 +1125,8 @@ components:
           type: string
         floor:
           type: string
+        stair:
+          type: string
         door:
           type: string
         coordinates:
@@ -984,13 +1138,19 @@ components:
             longitude:
               type: number
               format: double
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
     ActivityDTO:
       oneOf:
-        - $ref: '#/components/schemas/MapActivityDTO'
-        - $ref: '#/components/schemas/OnlineActivityDTO'
+        - $ref: '#/components/schemas/ActivityOnsiteDTO'
+        - $ref: '#/components/schemas/ActivityOnlineDTO'
       discriminator:
         propertyName: type
-    MapActivityDTO:
+    ActivityOnsiteDTO:
       allOf:
         - $ref: '#/components/schemas/ActivityBase'
       type: object
@@ -1006,7 +1166,7 @@ components:
           type: string
           enum:
             - map
-    OnlineActivityDTO:
+    ActivityOnlineDTO:
       allOf:
         - $ref: '#/components/schemas/ActivityBase'
       type: object
@@ -1029,10 +1189,9 @@ components:
       type: object
       required:
         - owner
+        - category
         - title
         - description
-        - category
-        - price
         - time
         - language
       properties:
@@ -1041,27 +1200,16 @@ components:
           format: uuid
         owner:
           $ref: '#/components/schemas/AccountDTO'
+        category:
+          $ref: '#/components/schemas/ActivityCategoryDTO'
         title:
           type: string
         description:
           type: string
-        category:
-          $ref: '#/components/schemas/ActivityCategoryDTO'
-        photos:
+        iamges:
           type: array
           items:
             type: string
-        price:
-          type: object
-          properties:
-            min:
-              type: number
-              format: double
-            max:
-              type: number
-              format: double
-            currency:
-              type: string
         time:
           type: object
           properties:
@@ -1071,6 +1219,19 @@ components:
             end:
               type: string
               format: date-time
+        price:
+          type: object
+          properties:
+            min:
+              type: number
+              format: double
+              default: 0.0
+            max:
+              type: number
+              format: double
+              default: 0.0
+            currency:
+              type: string
         participants:
           type: object
           properties:
@@ -1082,9 +1243,15 @@ components:
               format: int32
         language:
           type: string
+          enum:
+            - en
+            - es
         website:
           type: string
         createdAt:
+          type: string
+          format: date-time
+        updatedAt:
           type: string
           format: date-time
     ActivityCategoryDTO:
@@ -1111,6 +1278,9 @@ components:
         createdAt:
           type: string
           format: date-time
+        updatedAt:
+          type: string
+          format: date-time
     ActivityParticipantDTO:
       type: object
       required:
@@ -1124,8 +1294,61 @@ components:
         activity:
           $ref: '#/components/schemas/ActivityDTO'
         account:
-          $ref: '#/components/schemas/PersonalAccountDTO'
+          $ref: '#/components/schemas/AccountPersonalDTO'
         createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+    EstablishmentDTO:
+      type: object
+      required:
+        - owner
+        - address
+        - name
+      properties:
+        id:
+          type: string
+          format: uuid
+        owner:
+          $ref: '#/components/schemas/AccountEnterpriseDTO'
+        address:
+          $ref: '#/components/schemas/AddressDTO'
+        name:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+    EstablishmentRequestDTO:
+      type: object
+      required:
+        - requestFromAccount
+        - requestForActivity
+        - requestToEstablishment
+      properties:
+        id:
+          type: string
+          format: uuid
+        requestFromAccount:
+          $ref: '#/components/schemas/AccountEnterpriseDTO'
+        requestForActivity:
+          $ref: '#/components/schemas/ActivityOnsiteDTO'
+        requestToEstablishment:
+          $ref: '#/components/schemas/EstablishmentDTO'
+        status:
+          type: string
+          enum:
+            - pending
+            - approved
+            - rejected
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
           type: string
           format: date-time
   securitySchemes:
@@ -1169,6 +1392,14 @@ components:
         minLength: 4
         maxLength: 30
         pattern: '(^[a-z_0-9]+$)'
+    followRequestIdParam:
+      name: id
+      description: Follow request ID
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
     notificationIdParam:
       name: id
       description: Notification ID
