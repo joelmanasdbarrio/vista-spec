@@ -113,7 +113,59 @@ export interface paths {
         delete: operations["unfollowAccount"];
         options?: never;
         head?: never;
+        /**
+         * Update follow
+         * @description Update follow relationship
+         */
+        patch: operations["updateFollow"];
+        trace?: never;
+    };
+    "/follow-requests": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get follow requests
+         * @description Get all follow requests
+         */
+        get: operations["getFollowRequests"];
+        put?: never;
+        /**
+         * Create follow request
+         * @description Create follow request
+         */
+        post: operations["createFollowRequest"];
+        delete?: never;
+        options?: never;
+        head?: never;
         patch?: never;
+        trace?: never;
+    };
+    "/follow-requests/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /**
+         * Delete follow request
+         * @description Delete one follow request
+         */
+        delete: operations["deleteFollowRequest"];
+        options?: never;
+        head?: never;
+        /**
+         * Update follow request
+         * @description Update one follow request
+         */
+        patch: operations["updateFollowRequest"];
         trace?: never;
     };
     "/notifications": {
@@ -154,106 +206,6 @@ export interface paths {
          * @description Update one notification
          */
         patch: operations["updateNotification"];
-        trace?: never;
-    };
-    "/establishments": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * Get establishments
-         * @description Get all establishments
-         */
-        get: operations["getEstablishments"];
-        put?: never;
-        /**
-         * Create establishment
-         * @description Create establishment
-         */
-        post: operations["createEstablishment"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/establishments/{id}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * Get establishment
-         * @description Get one establishment
-         */
-        get: operations["getEstablishment"];
-        put?: never;
-        post?: never;
-        /**
-         * Delete establishment
-         * @description Delete one establishment
-         */
-        delete: operations["deleteEstablishment"];
-        options?: never;
-        head?: never;
-        /**
-         * Update establishment
-         * @description Update one establishment
-         */
-        patch: operations["updateEstablishment"];
-        trace?: never;
-    };
-    "/establishments/requests": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * Get establishment requests
-         * @description Get all establishment requests
-         */
-        get: operations["getEstablishmentRequests"];
-        put?: never;
-        /**
-         * Create establishment request
-         * @description Create establishment request
-         */
-        post: operations["createEstablishmentRequest"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/establishments/requests/{id}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        post?: never;
-        /**
-         * Delete establishment request
-         * @description Delete one establishment request
-         */
-        delete: operations["deleteEstablishmentRequest"];
-        options?: never;
-        head?: never;
-        /**
-         * Update establishment request
-         * @description Update one establishment request
-         */
-        patch: operations["updateEstablishmentRequest"];
         trace?: never;
     };
     "/activities": {
@@ -356,32 +308,143 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/establishments": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get establishments
+         * @description Get all establishments
+         */
+        get: operations["getEstablishments"];
+        put?: never;
+        /**
+         * Create establishment
+         * @description Create establishment
+         */
+        post: operations["createEstablishment"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/establishments/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get establishment
+         * @description Get one establishment
+         */
+        get: operations["getEstablishment"];
+        put?: never;
+        post?: never;
+        /**
+         * Delete establishment
+         * @description Delete one establishment
+         */
+        delete: operations["deleteEstablishment"];
+        options?: never;
+        head?: never;
+        /**
+         * Update establishment
+         * @description Update one establishment
+         */
+        patch: operations["updateEstablishment"];
+        trace?: never;
+    };
+    "/establishments/requests": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get establishment requests
+         * @description Get all establishment requests
+         */
+        get: operations["getEstablishmentRequests"];
+        put?: never;
+        /**
+         * Create establishment request
+         * @description Create establishment request
+         */
+        post: operations["createEstablishmentRequest"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/establishments/requests/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /**
+         * Delete establishment request
+         * @description Delete one establishment request
+         */
+        delete: operations["deleteEstablishmentRequest"];
+        options?: never;
+        head?: never;
+        /**
+         * Update establishment request
+         * @description Update one establishment request
+         */
+        patch: operations["updateEstablishmentRequest"];
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
-        AccountDTO: components["schemas"]["PersonalAccountDTO"] | components["schemas"]["EnterpriseAccountDTO"];
-        PersonalAccountDTO: {
-            /** @enum {string} */
+        AccountDTO: components["schemas"]["AccountPersonalDTO"] | components["schemas"]["AccountEnterpriseDTO"];
+        AccountPersonalDTO: {
+            /**
+             * @default other
+             * @enum {string}
+             */
+            gender: "male" | "female" | "other";
+            /**
+             * @default personal
+             * @enum {string}
+             */
             type: "personal";
         } & (components["schemas"]["AccountBase"] & {
             /**
              * @description discriminator enum property added by openapi-typescript
              * @enum {string}
              */
-            type: "PersonalAccountDTO";
+            type: "AccountPersonalDTO";
         });
-        EnterpriseAccountDTO: {
+        AccountEnterpriseDTO: {
             /** @default false */
-            verified: boolean;
-            /** @enum {string} */
+            isVerified: boolean;
+            /**
+             * @default enterprise
+             * @enum {string}
+             */
             type: "enterprise";
         } & (components["schemas"]["AccountBase"] & {
             /**
              * @description discriminator enum property added by openapi-typescript
              * @enum {string}
              */
-            type: "EnterpriseAccountDTO";
+            type: "AccountEnterpriseDTO";
         });
         AccountBase: {
             /** Format: uuid */
@@ -393,48 +456,54 @@ export interface components {
             avatar?: string;
             website?: string;
             /** @default false */
-            private: boolean;
+            isPrivate: boolean;
+            /** Format: date-time */
+            createdAt?: string;
+            /** Format: date-time */
+            updatedAt?: string;
         };
         FollowDTO: {
             /** Format: uuid */
-            id: string;
-            follower: components["schemas"]["PersonalAccountDTO"];
+            id?: string;
+            follower: components["schemas"]["AccountPersonalDTO"];
             following: components["schemas"]["AccountDTO"];
+            /** @default true */
+            isMuted: boolean;
             /** Format: date-time */
             createdAt?: string;
+            /** Format: date-time */
+            updatedAt?: string;
+        };
+        FollowRequestDTO: {
+            /** Format: uuid */
+            id?: string;
+            requestFrom: components["schemas"]["AccountPersonalDTO"];
+            requestTo: components["schemas"]["AccountDTO"];
+            /**
+             * @default pending
+             * @enum {string}
+             */
+            status: "pending" | "approved" | "rejected";
+            /** Format: date-time */
+            createdAt?: string;
+            /** Format: date-time */
+            updatedAt?: string;
         };
         NotificationDTO: {
             /** Format: uuid */
             id: string;
             /** @enum {string} */
             type: "follow" | "entry" | "activity" | "system";
+            content: string;
             /** @default false */
             isRead: boolean;
-            owner?: components["schemas"]["AccountDTO"];
+            owner: components["schemas"]["AccountDTO"];
             relatedAccount?: components["schemas"]["AccountDTO"];
             relatedActivity?: components["schemas"]["ActivityDTO"];
             /** Format: date-time */
             createdAt: string;
-        };
-        EstablishmentDTO: {
-            /** Format: uuid */
-            id?: string;
-            owner: components["schemas"]["EnterpriseAccountDTO"];
-            address: components["schemas"]["AddressDTO"];
-            name: string;
             /** Format: date-time */
-            createdAt?: string;
-        };
-        EstablishmentRequestDTO: {
-            /** Format: uuid */
-            id?: string;
-            owner: components["schemas"]["EnterpriseAccountDTO"];
-            relatedAccount?: components["schemas"]["EnterpriseAccountDTO"];
-            relatedEstablishment?: components["schemas"]["EstablishmentDTO"];
-            /** @enum {string} */
-            status?: "pending" | "accepted" | "rejected";
-            /** Format: date-time */
-            createdAt?: string;
+            updatedAt?: string;
         };
         AddressDTO: {
             country: string;
@@ -444,6 +513,7 @@ export interface components {
             number: string;
             block?: string;
             floor?: string;
+            stair?: string;
             door?: string;
             coordinates: {
                 /** Format: double */
@@ -451,9 +521,13 @@ export interface components {
                 /** Format: double */
                 longitude?: number;
             };
+            /** Format: date-time */
+            createdAt?: string;
+            /** Format: date-time */
+            updatedAt?: string;
         };
-        ActivityDTO: components["schemas"]["MapActivityDTO"] | components["schemas"]["OnlineActivityDTO"];
-        MapActivityDTO: {
+        ActivityDTO: components["schemas"]["ActivityOnsiteDTO"] | components["schemas"]["ActivityOnlineDTO"];
+        ActivityOnsiteDTO: {
             location: components["schemas"]["EstablishmentDTO"] | components["schemas"]["AddressDTO"];
             /** @enum {string} */
             type: "map";
@@ -462,9 +536,9 @@ export interface components {
              * @description discriminator enum property added by openapi-typescript
              * @enum {string}
              */
-            type: "MapActivityDTO";
+            type: "ActivityOnsiteDTO";
         });
-        OnlineActivityDTO: {
+        ActivityOnlineDTO: {
             location: {
                 url: string;
             };
@@ -475,28 +549,34 @@ export interface components {
              * @description discriminator enum property added by openapi-typescript
              * @enum {string}
              */
-            type: "OnlineActivityDTO";
+            type: "ActivityOnlineDTO";
         });
         ActivityBase: {
             /** Format: uuid */
             id?: string;
             owner: components["schemas"]["AccountDTO"];
+            category: components["schemas"]["ActivityCategoryDTO"];
             title: string;
             description: string;
-            category: components["schemas"]["ActivityCategoryDTO"];
-            photos?: string[];
-            price: {
-                /** Format: double */
-                min?: number;
-                /** Format: double */
-                max?: number;
-                currency?: string;
-            };
+            iamges?: string[];
             time: {
                 /** Format: date-time */
                 start?: string;
                 /** Format: date-time */
                 end?: string;
+            };
+            price?: {
+                /**
+                 * Format: double
+                 * @default 0
+                 */
+                min: number;
+                /**
+                 * Format: double
+                 * @default 0
+                 */
+                max: number;
+                currency?: string;
             };
             participants?: {
                 /** Format: int32 */
@@ -504,10 +584,13 @@ export interface components {
                 /** Format: int32 */
                 max?: number;
             };
-            language: string;
+            /** @enum {string} */
+            language: "en" | "es";
             website?: string;
             /** Format: date-time */
             createdAt?: string;
+            /** Format: date-time */
+            updatedAt?: string;
         };
         ActivityCategoryDTO: {
             /** Format: uuid */
@@ -519,14 +602,42 @@ export interface components {
             color?: string;
             /** Format: date-time */
             createdAt?: string;
+            /** Format: date-time */
+            updatedAt?: string;
         };
         ActivityParticipantDTO: {
             /** Format: uuid */
             id: string;
             activity: components["schemas"]["ActivityDTO"];
-            account: components["schemas"]["PersonalAccountDTO"];
+            account: components["schemas"]["AccountPersonalDTO"];
             /** Format: date-time */
             createdAt?: string;
+            /** Format: date-time */
+            updatedAt?: string;
+        };
+        EstablishmentDTO: {
+            /** Format: uuid */
+            id?: string;
+            owner: components["schemas"]["AccountEnterpriseDTO"];
+            address: components["schemas"]["AddressDTO"];
+            name: string;
+            /** Format: date-time */
+            createdAt?: string;
+            /** Format: date-time */
+            updatedAt?: string;
+        };
+        EstablishmentRequestDTO: {
+            /** Format: uuid */
+            id?: string;
+            requestFromAccount: components["schemas"]["AccountEnterpriseDTO"];
+            requestForActivity: components["schemas"]["ActivityOnsiteDTO"];
+            requestToEstablishment: components["schemas"]["EstablishmentDTO"];
+            /** @enum {string} */
+            status?: "pending" | "approved" | "rejected";
+            /** Format: date-time */
+            createdAt?: string;
+            /** Format: date-time */
+            updatedAt?: string;
         };
     };
     responses: {
@@ -635,6 +746,8 @@ export interface components {
         accountNameParam: string;
         /** @description Account username */
         accountUsernameParam: string;
+        /** @description Follow request ID */
+        followRequestIdParam: string;
         /** @description Notification ID */
         notificationIdParam: string;
         /** @description Establishment ID */
@@ -911,6 +1024,146 @@ export interface operations {
             500: components["responses"]["InternalServerError"];
         };
     };
+    updateFollow: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Account ID */
+                id: components["parameters"]["accountIdParam"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["FollowDTO"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["FollowDTO"];
+                };
+            };
+            400: components["responses"]["BadRequestError"];
+            401: components["responses"]["UnauthorizedError"];
+            403: components["responses"]["ForbiddenError"];
+            404: components["responses"]["NotFoundError"];
+            500: components["responses"]["InternalServerError"];
+        };
+    };
+    getFollowRequests: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["FollowRequestDTO"][];
+                };
+            };
+            401: components["responses"]["UnauthorizedError"];
+            403: components["responses"]["ForbiddenError"];
+            500: components["responses"]["InternalServerError"];
+        };
+    };
+    createFollowRequest: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["FollowRequestDTO"];
+            };
+        };
+        responses: {
+            /** @description Created */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["FollowRequestDTO"];
+                };
+            };
+            400: components["responses"]["BadRequestError"];
+            401: components["responses"]["UnauthorizedError"];
+            403: components["responses"]["ForbiddenError"];
+            500: components["responses"]["InternalServerError"];
+        };
+    };
+    deleteFollowRequest: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Follow request ID */
+                id: components["parameters"]["followRequestIdParam"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description No Content */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            401: components["responses"]["UnauthorizedError"];
+            403: components["responses"]["ForbiddenError"];
+            404: components["responses"]["NotFoundError"];
+            500: components["responses"]["InternalServerError"];
+        };
+    };
+    updateFollowRequest: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Follow request ID */
+                id: components["parameters"]["followRequestIdParam"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["FollowRequestDTO"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["FollowRequestDTO"];
+                };
+            };
+            400: components["responses"]["BadRequestError"];
+            401: components["responses"]["UnauthorizedError"];
+            403: components["responses"]["ForbiddenError"];
+            404: components["responses"]["NotFoundError"];
+            500: components["responses"]["InternalServerError"];
+        };
+    };
     getNotifications: {
         parameters: {
             query?: never;
@@ -959,254 +1212,6 @@ export interface operations {
                     "application/json": components["schemas"]["NotificationDTO"];
                 };
             };
-            401: components["responses"]["UnauthorizedError"];
-            403: components["responses"]["ForbiddenError"];
-            404: components["responses"]["NotFoundError"];
-            500: components["responses"]["InternalServerError"];
-        };
-    };
-    getEstablishments: {
-        parameters: {
-            query?: {
-                /** @description Establishment name */
-                name?: components["parameters"]["establishmentNameParam"];
-                /** @description Establishment address */
-                address?: components["parameters"]["establishmentAddressParam"];
-            };
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["EstablishmentDTO"][];
-                };
-            };
-            401: components["responses"]["UnauthorizedError"];
-            403: components["responses"]["ForbiddenError"];
-            500: components["responses"]["InternalServerError"];
-        };
-    };
-    createEstablishment: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["EstablishmentDTO"];
-            };
-        };
-        responses: {
-            /** @description Created */
-            201: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["EstablishmentDTO"];
-                };
-            };
-            400: components["responses"]["BadRequestError"];
-            401: components["responses"]["UnauthorizedError"];
-            403: components["responses"]["ForbiddenError"];
-            500: components["responses"]["InternalServerError"];
-        };
-    };
-    getEstablishment: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                /** @description Establishment ID */
-                id: components["parameters"]["establishmentIdParam"];
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["EstablishmentDTO"];
-                };
-            };
-            401: components["responses"]["UnauthorizedError"];
-            403: components["responses"]["ForbiddenError"];
-            404: components["responses"]["NotFoundError"];
-            500: components["responses"]["InternalServerError"];
-        };
-    };
-    deleteEstablishment: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                /** @description Establishment ID */
-                id: components["parameters"]["establishmentIdParam"];
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description No Content */
-            204: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-            401: components["responses"]["UnauthorizedError"];
-            403: components["responses"]["ForbiddenError"];
-            404: components["responses"]["NotFoundError"];
-            500: components["responses"]["InternalServerError"];
-        };
-    };
-    updateEstablishment: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                /** @description Establishment ID */
-                id: components["parameters"]["establishmentIdParam"];
-            };
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["EstablishmentDTO"];
-            };
-        };
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["EstablishmentDTO"];
-                };
-            };
-            400: components["responses"]["BadRequestError"];
-            401: components["responses"]["UnauthorizedError"];
-            403: components["responses"]["ForbiddenError"];
-            404: components["responses"]["NotFoundError"];
-            500: components["responses"]["InternalServerError"];
-        };
-    };
-    getEstablishmentRequests: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["EstablishmentRequestDTO"][];
-                };
-            };
-            401: components["responses"]["UnauthorizedError"];
-            403: components["responses"]["ForbiddenError"];
-            500: components["responses"]["InternalServerError"];
-        };
-    };
-    createEstablishmentRequest: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["EstablishmentRequestDTO"];
-            };
-        };
-        responses: {
-            /** @description Created */
-            201: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["EstablishmentRequestDTO"];
-                };
-            };
-            400: components["responses"]["BadRequestError"];
-            401: components["responses"]["UnauthorizedError"];
-            403: components["responses"]["ForbiddenError"];
-            500: components["responses"]["InternalServerError"];
-        };
-    };
-    deleteEstablishmentRequest: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                /** @description Establishment request ID */
-                id: components["parameters"]["establishmentRequestIdParam"];
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description No Content */
-            204: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-            401: components["responses"]["UnauthorizedError"];
-            403: components["responses"]["ForbiddenError"];
-            404: components["responses"]["NotFoundError"];
-            500: components["responses"]["InternalServerError"];
-        };
-    };
-    updateEstablishmentRequest: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                /** @description Establishment request ID */
-                id: components["parameters"]["establishmentRequestIdParam"];
-            };
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["EstablishmentRequestDTO"];
-            };
-        };
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["EstablishmentRequestDTO"];
-                };
-            };
-            400: components["responses"]["BadRequestError"];
             401: components["responses"]["UnauthorizedError"];
             403: components["responses"]["ForbiddenError"];
             404: components["responses"]["NotFoundError"];
@@ -1479,6 +1484,254 @@ export interface operations {
             };
             401: components["responses"]["UnauthorizedError"];
             403: components["responses"]["ForbiddenError"];
+            500: components["responses"]["InternalServerError"];
+        };
+    };
+    getEstablishments: {
+        parameters: {
+            query?: {
+                /** @description Establishment name */
+                name?: components["parameters"]["establishmentNameParam"];
+                /** @description Establishment address */
+                address?: components["parameters"]["establishmentAddressParam"];
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["EstablishmentDTO"][];
+                };
+            };
+            401: components["responses"]["UnauthorizedError"];
+            403: components["responses"]["ForbiddenError"];
+            500: components["responses"]["InternalServerError"];
+        };
+    };
+    createEstablishment: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["EstablishmentDTO"];
+            };
+        };
+        responses: {
+            /** @description Created */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["EstablishmentDTO"];
+                };
+            };
+            400: components["responses"]["BadRequestError"];
+            401: components["responses"]["UnauthorizedError"];
+            403: components["responses"]["ForbiddenError"];
+            500: components["responses"]["InternalServerError"];
+        };
+    };
+    getEstablishment: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Establishment ID */
+                id: components["parameters"]["establishmentIdParam"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["EstablishmentDTO"];
+                };
+            };
+            401: components["responses"]["UnauthorizedError"];
+            403: components["responses"]["ForbiddenError"];
+            404: components["responses"]["NotFoundError"];
+            500: components["responses"]["InternalServerError"];
+        };
+    };
+    deleteEstablishment: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Establishment ID */
+                id: components["parameters"]["establishmentIdParam"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description No Content */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            401: components["responses"]["UnauthorizedError"];
+            403: components["responses"]["ForbiddenError"];
+            404: components["responses"]["NotFoundError"];
+            500: components["responses"]["InternalServerError"];
+        };
+    };
+    updateEstablishment: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Establishment ID */
+                id: components["parameters"]["establishmentIdParam"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["EstablishmentDTO"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["EstablishmentDTO"];
+                };
+            };
+            400: components["responses"]["BadRequestError"];
+            401: components["responses"]["UnauthorizedError"];
+            403: components["responses"]["ForbiddenError"];
+            404: components["responses"]["NotFoundError"];
+            500: components["responses"]["InternalServerError"];
+        };
+    };
+    getEstablishmentRequests: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["EstablishmentRequestDTO"][];
+                };
+            };
+            401: components["responses"]["UnauthorizedError"];
+            403: components["responses"]["ForbiddenError"];
+            500: components["responses"]["InternalServerError"];
+        };
+    };
+    createEstablishmentRequest: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["EstablishmentRequestDTO"];
+            };
+        };
+        responses: {
+            /** @description Created */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["EstablishmentRequestDTO"];
+                };
+            };
+            400: components["responses"]["BadRequestError"];
+            401: components["responses"]["UnauthorizedError"];
+            403: components["responses"]["ForbiddenError"];
+            500: components["responses"]["InternalServerError"];
+        };
+    };
+    deleteEstablishmentRequest: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Establishment request ID */
+                id: components["parameters"]["establishmentRequestIdParam"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description No Content */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            401: components["responses"]["UnauthorizedError"];
+            403: components["responses"]["ForbiddenError"];
+            404: components["responses"]["NotFoundError"];
+            500: components["responses"]["InternalServerError"];
+        };
+    };
+    updateEstablishmentRequest: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Establishment request ID */
+                id: components["parameters"]["establishmentRequestIdParam"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["EstablishmentRequestDTO"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["EstablishmentRequestDTO"];
+                };
+            };
+            400: components["responses"]["BadRequestError"];
+            401: components["responses"]["UnauthorizedError"];
+            403: components["responses"]["ForbiddenError"];
+            404: components["responses"]["NotFoundError"];
             500: components["responses"]["InternalServerError"];
         };
     };
