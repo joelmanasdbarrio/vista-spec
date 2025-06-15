@@ -133,11 +133,7 @@ export interface paths {
          */
         get: operations["getFollowRequests"];
         put?: never;
-        /**
-         * Create follow request
-         * @description Create follow request
-         */
-        post: operations["createFollowRequest"];
+        post?: never;
         delete?: never;
         options?: never;
         head?: never;
@@ -464,7 +460,7 @@ export interface components {
         };
         FollowDTO: {
             /** Format: uuid */
-            id?: string;
+            id: string;
             follower: components["schemas"]["AccountPersonalDTO"];
             following: components["schemas"]["AccountDTO"];
             /** @default true */
@@ -476,7 +472,7 @@ export interface components {
         };
         FollowRequestDTO: {
             /** Format: uuid */
-            id?: string;
+            id: string;
             requestFrom: components["schemas"]["AccountPersonalDTO"];
             requestTo: components["schemas"]["AccountDTO"];
             /**
@@ -1074,34 +1070,6 @@ export interface operations {
                     "application/json": components["schemas"]["FollowRequestDTO"][];
                 };
             };
-            401: components["responses"]["UnauthorizedError"];
-            403: components["responses"]["ForbiddenError"];
-            500: components["responses"]["InternalServerError"];
-        };
-    };
-    createFollowRequest: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["FollowRequestDTO"];
-            };
-        };
-        responses: {
-            /** @description Created */
-            201: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["FollowRequestDTO"];
-                };
-            };
-            400: components["responses"]["BadRequestError"];
             401: components["responses"]["UnauthorizedError"];
             403: components["responses"]["ForbiddenError"];
             500: components["responses"]["InternalServerError"];
