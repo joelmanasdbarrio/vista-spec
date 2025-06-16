@@ -302,35 +302,6 @@ paths:
           $ref: '#/components/responses/ForbiddenError'
         '500':
           $ref: '#/components/responses/InternalServerError'
-    post:
-      tags:
-        - Accounts
-      summary: Create follow request
-      operationId: createFollowRequest
-      description: Create follow request
-      security:
-        - bearerAuth: []
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/FollowRequestDTO'
-      responses:
-        '201':
-          description: Created
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/FollowRequestDTO'
-        '400':
-          $ref: '#/components/responses/BadRequestError'
-        '401':
-          $ref: '#/components/responses/UnauthorizedError'
-        '403':
-          $ref: '#/components/responses/ForbiddenError'
-        '500':
-          $ref: '#/components/responses/InternalServerError'
   /follow-requests/{id}:
     patch:
       tags:
@@ -1017,6 +988,7 @@ components:
     FollowDTO:
       type: object
       required:
+        - id
         - follower
         - following
         - isMuted
@@ -1040,6 +1012,7 @@ components:
     FollowRequestDTO:
       type: object
       required:
+        - id
         - requestFrom
         - requestTo
         - status
