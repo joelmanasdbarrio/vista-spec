@@ -187,4 +187,4 @@ jobs:
           npm publish --tag latest --access public
       - name: Add job summary
         run: |
-          echo "✅ Published **main** version as `@joelmanasdbarrio/vista-spec@${{ steps.version.outputs.package_version }}`." >> $GITHUB_STEP_SUMMARY
+          echo "✅ Published **main** version as `@joelmanasdbarrio/vista-spec@${{ steps.version.outputs.new_version }}`." >> $GITHUB_STEP_SUMMARY
