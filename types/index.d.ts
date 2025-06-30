@@ -52,6 +52,26 @@ export interface paths {
         patch: operations["updateAccount"];
         trace?: never;
     };
+    "/accounts/{id}/establishments": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get account establishments
+         * @description Get account establishments
+         */
+        get: operations["getAccountEstablishments"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/accounts/{id}/followers": {
         parameters: {
             query?: never;
@@ -147,7 +167,11 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        get?: never;
+        /**
+         * Get follow request
+         * @description Get one follow request
+         */
+        get: operations["getFollowRequest"];
         put?: never;
         post?: never;
         /**
@@ -415,6 +439,8 @@ export interface components {
              * @enum {string}
              */
             gender: "male" | "female" | "other";
+            /** Format: date */
+            birthdate?: string;
             /**
              * @default personal
              * @enum {string}
@@ -489,7 +515,7 @@ export interface components {
             /** Format: uuid */
             id: string;
             /** @enum {string} */
-            type: "follow" | "entry" | "activity" | "system";
+            type: "follow" | "followRequest" | "establishmentRequest" | "entry" | "activity" | "system";
             content: string;
             /** @default false */
             isRead: boolean;
@@ -526,7 +552,7 @@ export interface components {
         ActivityOnsiteDTO: {
             location: components["schemas"]["EstablishmentDTO"] | components["schemas"]["AddressDTO"];
             /** @enum {string} */
-            type: "map";
+            type: "onsite";
         } & (components["schemas"]["ActivityBase"] & {
             /**
              * @description discriminator enum property added by openapi-typescript
@@ -554,7 +580,7 @@ export interface components {
             category: components["schemas"]["ActivityCategoryDTO"];
             title: string;
             description: string;
-            iamges?: string[];
+            images?: string[];
             time: {
                 /** Format: date-time */
                 start?: string;
@@ -583,6 +609,8 @@ export interface components {
             /** @enum {string} */
             language: "en" | "es";
             website?: string;
+            /** @default true */
+            isDraft: boolean;
             /** Format: date-time */
             createdAt?: string;
             /** Format: date-time */
@@ -769,7 +797,7 @@ export interface components {
         /** @description Activity language */
         activityLanguageParam: string;
         /** @description Activity type */
-        activityTypeParam: "map" | "online";
+        activityTypeParam: "onsite" | "online";
         /** @description Activity time start */
         activityTimeStartParam: string;
         /** @description Activity time end */
@@ -904,6 +932,38 @@ export interface operations {
             500: components["responses"]["InternalServerError"];
         };
     };
+    getAccountEstablishments: {
+        parameters: {
+            query?: {
+                /** @description Establishment name */
+                name?: components["parameters"]["establishmentNameParam"];
+                /** @description Establishment address */
+                address?: components["parameters"]["establishmentAddressParam"];
+            };
+            header?: never;
+            path: {
+                /** @description Account ID */
+                id: components["parameters"]["accountIdParam"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["EstablishmentDTO"][];
+                };
+            };
+            401: components["responses"]["UnauthorizedError"];
+            403: components["responses"]["ForbiddenError"];
+            404: components["responses"]["NotFoundError"];
+            500: components["responses"]["InternalServerError"];
+        };
+    };
     getAccountFollowers: {
         parameters: {
             query?: {
@@ -927,7 +987,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["AccountDTO"][];
+                    "application/json": components["schemas"]["AccountPersonalDTO"][];
                 };
             };
             401: components["responses"]["UnauthorizedError"];
@@ -1072,6 +1132,33 @@ export interface operations {
             };
             401: components["responses"]["UnauthorizedError"];
             403: components["responses"]["ForbiddenError"];
+            500: components["responses"]["InternalServerError"];
+        };
+    };
+    getFollowRequest: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Follow request ID */
+                id: components["parameters"]["followRequestIdParam"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["FollowRequestDTO"];
+                };
+            };
+            401: components["responses"]["UnauthorizedError"];
+            403: components["responses"]["ForbiddenError"];
+            404: components["responses"]["NotFoundError"];
             500: components["responses"]["InternalServerError"];
         };
     };
