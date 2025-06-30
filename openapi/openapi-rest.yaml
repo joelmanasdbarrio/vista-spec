@@ -16,6 +16,8 @@ info:
 tags:
   - name: Accounts
     description: Account operations
+  - name: Follow Requests
+    description: Follow request operations
   - name: Notifications
     description: Notification operations
   - name: Activities
@@ -138,6 +140,36 @@ paths:
           $ref: '#/components/responses/ForbiddenError'
         '500':
           $ref: '#/components/responses/InternalServerError'
+  /accounts/{id}/establishments:
+    get:
+      tags:
+        - Accounts
+      summary: Get account establishments
+      operationId: getAccountEstablishments
+      description: Get account establishments
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/accountIdParam'
+        - $ref: '#/components/parameters/establishmentNameParam'
+        - $ref: '#/components/parameters/establishmentAddressParam'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/EstablishmentDTO'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
   /accounts/{id}/followers:
     get:
       tags:
@@ -159,7 +191,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/AccountDTO'
+                  $ref: '#/components/schemas/AccountPersonalDTO'
         '401':
           $ref: '#/components/responses/UnauthorizedError'
         '404':
@@ -281,7 +313,7 @@ paths:
   /follow-requests:
     get:
       tags:
-        - Accounts
+        - Follow Requests
       summary: Get follow requests
       operationId: getFollowRequests
       description: Get all follow requests
@@ -303,9 +335,34 @@ paths:
         '500':
           $ref: '#/components/responses/InternalServerError'
   /follow-requests/{id}:
+    get:
+      tags:
+        - Follow Requests
+      summary: Get follow request
+      operationId: getFollowRequest
+      description: Get one follow request
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/followRequestIdParam'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FollowRequestDTO'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
     patch:
       tags:
-        - Accounts
+        - Follow Requests
       summary: Update follow request
       operationId: updateFollowRequest
       description: Update one follow request
@@ -338,7 +395,7 @@ paths:
           $ref: '#/components/responses/InternalServerError'
     delete:
       tags:
-        - Accounts
+        - Follow Requests
       summary: Delete follow request
       operationId: deleteFollowRequest
       description: Delete one follow request
@@ -927,6 +984,9 @@ components:
             - female
             - other
           default: other
+        birthdate:
+          type: string
+          format: date
         type:
           type: string
           enum:
@@ -1054,6 +1114,8 @@ components:
           type: string
           enum:
             - follow
+            - followRequest
+            - establishmentRequest
             - entry
             - activity
             - system
@@ -1138,7 +1200,7 @@ components:
         type:
           type: string
           enum:
-            - map
+            - onsite
     ActivityOnlineDTO:
       allOf:
         - $ref: '#/components/schemas/ActivityBase'
@@ -1179,7 +1241,7 @@ components:
           type: string
         description:
           type: string
-        iamges:
+        images:
           type: array
           items:
             type: string
@@ -1221,6 +1283,9 @@ components:
             - es
         website:
           type: string
+        isDraft:
+          type: boolean
+          default: true
         createdAt:
           type: string
           format: date-time
@@ -1463,7 +1528,7 @@ components:
       schema:
         type: string
         enum:
-          - map
+          - onsite
           - online
     activityTimeStartParam:
       name: timeStart
