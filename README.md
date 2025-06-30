@@ -7,11 +7,9 @@ This package is published to a private registry of GitHub Packages. To be able t
 //npm.pkg.github.com/:_authToken=${NODE_AUTH_TOKEN}
 ```
 
-> [!DANGER]
-> Replace `${NODE_AUTH_TOKEN}` with a valid PAT token (classic token) that has read/write permissions on the repository and packages.
+> ⚠️ Replace `${NODE_AUTH_TOKEN}` with a valid PAT token (classic token) that has read/write permissions on the repository and packages.
 
-> [!DANGER]
-> Do NOT upload the `.npmrc` file with your token to the repository. If it's not already there, add this file to the `.gitignore` or use the `.npmrc` file from your personal folder.
+> ⚠️ Do NOT upload the `.npmrc` file with your token to the repository. If it's not already there, add this file to the `.gitignore` or use the `.npmrc` file from your personal folder.
 
 ## Installation
 
@@ -38,8 +36,7 @@ This package is published to a private registry of GitHub Packages. To be able t
 
 The `@joelmanasdbarrio/vista-spec` package leverages semantic versioning and dist-tags from NPM to publish new packages. Packages published from:
 
-> [!DANGER]
-> Package and specification version must remain the same to avoid inconsistencies.
+> ⚠️ Package and specification version must remain the same to avoid inconsistencies.
 
 - `dev`: `1.3.0-dev.N` in `dev` tag (experimental), where `N` is the commit number. From a `feature` branch, create a new merge-request into `dev` once the implementation is finished to trigger the GitHub workflow that validates and publishes a new experimental version of the package. Developers can commit as many changes as they need without having to update the final version of the package/specification while having an active merge-request since it will autoincrement its value based on the commit number on each run.
     <details>
