@@ -4,10 +4,11 @@ This package is published to a private registry of GitHub Packages. To be able t
 
 ```bash
 @joelmanasdbarrio:registry=https://npm.pkg.github.com/
-//npm.pkg.github.com/:_authToken=${NODE_AUTH_TOKEN}
+//npm.pkg.github.com/:_authToken=${AUTH_TOKEN}
 ```
 
-> ⚠️ Replace `${NODE_AUTH_TOKEN}` with a valid PAT token (classic token) that has read/write permissions on the repository and packages.
+> [!DANGER]
+> Replace `${AUTH_TOKEN}` with a valid PAT token (classic token) that has read/write permissions on the repository and packages.
 
 > ⚠️ Do NOT upload the `.npmrc` file with your token to the repository. If it's not already there, add this file to the `.gitignore` or use the `.npmrc` file from your personal folder.
 
@@ -23,11 +24,6 @@ This package is published to a private registry of GitHub Packages. To be able t
 2. Validate specification:
     ```bash
     npm run validate
-    ```
-  
-3. Generate TypeScript interfaces:
-    ```bash
-    npm run generate:types
     ```
 
 </Steps>
@@ -146,11 +142,11 @@ jobs:
 <details>
 <summary>validate-specification</summary>
 
-Checks if a major/minor version number has already been released:
+Checks if the OpenAPI specification is valid using the `swagger-cli` tool:
 
 ```yaml
 validate-specification:
-  if: github.event_name == 'pull_request'
+  if: github.event_name == 'pull_request' || github.event_name == 'push'
   runs-on: ubuntu-latest
   steps:
     - uses: actions/checkout@v3
@@ -171,7 +167,7 @@ Compares the specification and package versions to assert they are equal:
 
 ```yaml
 check-version:
-  if: github.event_name == 'pull_request'
+  if: github.event_name == 'pull_request' || github.event_name == 'push'
   runs-on: ubuntu-latest
   outputs:
     base_version: ${{ steps.pkg.outputs.version }}
@@ -204,46 +200,17 @@ check-version:
 
 </details>
 <details>
-<summary>generate-types</summary>
-
-Generates TypeScript interfaces based on the specification:
-
-```yaml
-generate-types:
-  needs: check-version
-  if: github.event_name == 'pull_request' && (github.base_ref == 'dev' || github.base_ref == 'release' || github.base_ref == 'main')
-  runs-on: ubuntu-latest
-  steps:
-    - uses: actions/checkout@v3
-    - uses: actions/setup-node@v4
-      with:
-        node-version: 22
-        registry-url: https://npm.pkg.github.com
-    - run: npm ci
-    - run: rm -rf types/
-      name: Clean previous types
-    - run: npm run generate:types
-      name: Generate TS types
-    - uses: EndBug/add-and-commit@v9
-      with:
-        author_name: github-actions[bot]
-        author_email: 41898282+github-actions[bot]@users.noreply.github.com
-        message: "regenerate OpenAPI types"
-```
-
-</details>
-<details>
 <summary>publish-package-\[dev, release, main\]</summary>
 
 Creates and publishes a new version of the `@joelmanasdbarrio/vista-spec` package with a specific version, depending on the environment:
 
 ```yaml
 publish-package-dev:
-  needs: [generate-types, check-version]
+  needs: check-version
   if: github.event.action != 'closed' && (github.base_ref == 'dev' && startsWith(github.head_ref, 'feature/'))
   runs-on: ubuntu-latest
   env:
-    NODE_AUTH_TOKEN: ${{ secrets.DEPLOYMENT_TOKEN }}
+    AUTH_TOKEN: ${{ secrets.DEPLOYMENT_TOKEN }}
   steps:
     - uses: actions/checkout@v4
     - uses: actions/setup-node@v4
@@ -279,11 +246,11 @@ publish-package-dev:
           ❌ Error on publication. Review workflow logs for more information.
 
 publish-package-release:
-  needs: [generate-types, check-version]
+  needs: check-version
   if: github.event.action != 'closed' && (github.base_ref == 'main' && startsWith(github.head_ref, 'release/'))
   runs-on: ubuntu-latest
   env:
-    NODE_AUTH_TOKEN: ${{ secrets.DEPLOYMENT_TOKEN }}
+    AUTH_TOKEN: ${{ secrets.DEPLOYMENT_TOKEN }}
   steps:
     - uses: actions/checkout@v4
     - uses: actions/setup-node@v4
@@ -319,11 +286,11 @@ publish-package-release:
           ❌ Error on publication. Review workflow logs for more information.
 
 publish-package-main:
-  needs: [generate-types, check-version]
+  needs: check-version
   if: github.ref == 'refs/heads/main'
   runs-on: ubuntu-latest
   env:
-    NODE_AUTH_TOKEN: ${{ secrets.DEPLOYMENT_TOKEN }}
+    AUTH_TOKEN: ${{ secrets.DEPLOYMENT_TOKEN }}
   steps:
     - uses: actions/checkout@v4
     - uses: actions/setup-node@v4
@@ -335,16 +302,14 @@ publish-package-main:
       id: version
       run: |
         BASE_VERSION=${{ needs.check-version.outputs.base_version }}
-        VERSION=${BASE_VERSION}
-        echo "VERSION=$VERSION" >> $GITHUB_ENV
-        echo "new_version=$VERSION" >> $GITHUB_OUTPUT
+        echo "BASE_VERSION=$BASE_VERSION" >> $GITHUB_ENV
+        echo "new_version=$BASE_VERSION" >> $GITHUB_OUTPUT
     - name: Publish package
       run: |
-        npm version $VERSION --no-git-tag-version
         npm publish --tag latest --access public
     - name: Add job summary
       run: |
-        echo "✅ Published **main** version as `@joelmanasdbarrio/vista-spec@${{ steps.version.outputs.package_version }}`." >> $GITHUB_STEP_SUMMARY
+        echo "✅ Published **main** version as `@joelmanasdbarrio/vista-spec@${{ steps.version.outputs.new_version }}`." >> $GITHUB_STEP_SUMMARY
 ```
 
 Experimental and Release Candidate versions are autoincremented based on commit number to avoid version overrides.
