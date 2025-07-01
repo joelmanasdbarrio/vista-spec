@@ -7,8 +7,7 @@ This package is published to a private registry of GitHub Packages. To be able t
 //npm.pkg.github.com/:_authToken=${AUTH_TOKEN}
 ```
 
-> [!DANGER]
-> Replace `${AUTH_TOKEN}` with a valid PAT token (classic token) that has read/write permissions on the repository and packages.
+> ⚠️ Replace `${AUTH_TOKEN}` with a valid PAT token (classic token) that has read/write permissions on the repository and packages.
 
 > ⚠️ Do NOT upload the `.npmrc` file with your token to the repository. If it's not already there, add this file to the `.gitignore` or use the `.npmrc` file from your personal folder.
 
@@ -188,6 +187,14 @@ check-version:
       with:
         file-path: openapi/openapi-rest.yaml
         separator: '__'
+    - name: Check if version already published
+      run: |
+        PKG_NAME=$(jq -r .name package.json)
+        VERSION=${{ steps.pkg.outputs.version }}
+        if npm view "$PKG_NAME@$VERSION" version --registry=https://npm.pkg.github.com > /dev/null 2>&1; then
+          echo "::error ::Version $VERSION of $PKG_NAME is already published."
+          exit 1
+        fi
     - run: |
         if [ "${{ steps.pkg.outputs.version }}" != "${{ steps.spec.outputs.info__version }}" ]; then
           echo "::error ::Version mismatch: package.json (${{
@@ -206,7 +213,7 @@ Creates and publishes a new version of the `@joelmanasdbarrio/vista-spec` packag
 
 ```yaml
 publish-package-dev:
-  needs: check-version
+  needs: [check-version, validate-specification]
   if: github.event.action != 'closed' && (github.base_ref == 'dev' && startsWith(github.head_ref, 'feature/'))
   runs-on: ubuntu-latest
   env:
@@ -246,7 +253,7 @@ publish-package-dev:
           ❌ Error on publication. Review workflow logs for more information.
 
 publish-package-release:
-  needs: check-version
+  needs: [check-version, validate-specification]
   if: github.event.action != 'closed' && (github.base_ref == 'main' && startsWith(github.head_ref, 'release/'))
   runs-on: ubuntu-latest
   env:
@@ -286,7 +293,7 @@ publish-package-release:
           ❌ Error on publication. Review workflow logs for more information.
 
 publish-package-main:
-  needs: check-version
+  needs: [check-version, validate-specification]
   if: github.ref == 'refs/heads/main'
   runs-on: ubuntu-latest
   env:
