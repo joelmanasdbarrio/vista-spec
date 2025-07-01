@@ -65,7 +65,7 @@ jobs:
         name: Ensure versions match
 
   publish-package-dev:
-    needs: check-version
+    needs: [check-version, validate-specification]
     if: github.event.action != 'closed' && (github.base_ref == 'dev' && startsWith(github.head_ref, 'feature/'))
     runs-on: ubuntu-latest
     env:
@@ -105,7 +105,7 @@ jobs:
             ❌ Error on publication. Review workflow logs for more information.
 
   publish-package-release:
-    needs: check-version
+    needs: [check-version, validate-specification]
     if: github.event.action != 'closed' && (github.base_ref == 'main' && startsWith(github.head_ref, 'release/'))
     runs-on: ubuntu-latest
     env:
@@ -145,7 +145,7 @@ jobs:
             ❌ Error on publication. Review workflow logs for more information.
 
   publish-package-main:
-    needs: check-version
+    needs: [check-version, validate-specification]
     if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     env:
