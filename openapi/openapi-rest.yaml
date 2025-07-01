@@ -1111,6 +1111,7 @@ components:
           type: string
         images:
           type: array
+          default: []
           items:
             type: string
         time:
@@ -1470,6 +1471,7 @@ components:
                     default: success
                   data:
                     type: array
+                    default: []
                     items:
                       $ref: '#/components/schemas/AccountDTO'
               - $ref: '#/components/schemas/PaginatedResponse'
@@ -1529,6 +1531,7 @@ components:
                     default: success
                   data:
                     type: array
+                    default: []
                     items:
                       $ref: '#/components/schemas/FollowRequestDTO'
               - $ref: '#/components/schemas/PaginatedResponse'
@@ -1560,6 +1563,7 @@ components:
                     default: success
                   data:
                     type: array
+                    default: []
                     items:
                       $ref: '#/components/schemas/NotificationDTO'
               - $ref: '#/components/schemas/PaginatedResponse'
@@ -1591,6 +1595,7 @@ components:
                     default: success
                   data:
                     type: array
+                    default: []
                     items:
                       $ref: '#/components/schemas/ActivityDTO'
               - $ref: '#/components/schemas/PaginatedResponse'
@@ -1622,6 +1627,7 @@ components:
                     default: success
                   data:
                     type: array
+                    default: []
                     items:
                       $ref: '#/components/schemas/ActivityParticipantDTO'
               - $ref: '#/components/schemas/PaginatedResponse'
@@ -1639,6 +1645,7 @@ components:
                     default: success
                   data:
                     type: array
+                    default: []
                     items:
                       $ref: '#/components/schemas/ActivityCategoryDTO'
               - $ref: '#/components/schemas/PaginatedResponse'
@@ -1656,6 +1663,7 @@ components:
                     default: success
                   data:
                     type: array
+                    default: []
                     items:
                       $ref: '#/components/schemas/EstablishmentDTO'
               - $ref: '#/components/schemas/PaginatedResponse'
@@ -1687,6 +1695,7 @@ components:
                     default: success
                   data:
                     type: array
+                    default: []
                     items:
                       $ref: '#/components/schemas/EstablishmentRequestDTO'
               - $ref: '#/components/schemas/PaginatedResponse'
@@ -1713,8 +1722,7 @@ components:
             properties:
               status:
                 type: string
-                enum:
-                  - error
+                enum: [error]
                 default: error
               statusCode:
                 type: integer
@@ -1722,6 +1730,7 @@ components:
                 example: 400
               errors:
                 type: array
+                default: []
                 items:
                   type: object
                   properties:
@@ -1743,8 +1752,7 @@ components:
             properties:
               status:
                 type: string
-                enum:
-                  - error
+                enum: [error]
                 default: error
               statusCode:
                 type: integer
@@ -1771,8 +1779,7 @@ components:
             properties:
               status:
                 type: string
-                enum:
-                  - error
+                enum: [error]
                 default: error
               statusCode:
                 type: integer
@@ -1799,8 +1806,7 @@ components:
             properties:
               status:
                 type: string
-                enum:
-                  - error
+                enum: [error]
                 default: error
               statusCode:
                 type: integer
@@ -1827,8 +1833,7 @@ components:
             properties:
               status:
                 type: string
-                enum:
-                  - error
+                enum: [error]
                 default: error
               statusCode:
                 type: integer
