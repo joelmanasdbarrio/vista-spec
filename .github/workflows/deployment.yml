@@ -47,6 +47,14 @@ jobs:
         with:
           file-path: openapi/openapi-rest.yaml
           separator: '__'
+      - name: Check if version already published
+        run: |
+          PKG_NAME=$(jq -r .name package.json)
+          VERSION=${{ steps.pkg.outputs.version }}
+          if npm view "$PKG_NAME@$VERSION" version --registry=https://npm.pkg.github.com > /dev/null 2>&1; then
+            echo "::error ::Version $VERSION of $PKG_NAME is already published."
+            exit 1
+          fi
       - run: |
           if [ "${{ steps.pkg.outputs.version }}" != "${{ steps.spec.outputs.info__version }}" ]; then
             echo "::error ::Version mismatch: package.json (${{
@@ -56,38 +64,12 @@ jobs:
           fi
         name: Ensure versions match
 
-  generate-types:
-    needs: [check-version, validate-specification]
-    if: (github.event_name == 'pull_request' && (github.base_ref == 'dev' || github.base_ref == 'release' || github.base_ref == 'main')) || (github.event_name == 'push' && github.ref == 'refs/heads/main')
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 22
-          registry-url: https://npm.pkg.github.com
-      - run: npm ci
-      - name: Pull with rebase before commit
-        run: git pull --rebase origin ${{ github.head_ref }}
-        if: github.event_name == 'pull_request'
-      - run: rm -rf types/
-        name: Clean previous types
-      - run: npm run generate:types
-        name: Generate TS types
-      - uses: EndBug/add-and-commit@v9
-        with:
-          author_name: github-actions[bot]
-          author_email: 41898282+github-actions[bot]@users.noreply.github.com
-          message: "regenerate OpenAPI types"
-          add: .
-          push: ${{ github.event_name == 'pull_request' && github.head_ref != '' && format('origin HEAD:{0}', github.head_ref) || 'true' }}
-
   publish-package-dev:
-    needs: [generate-types, check-version]
+    needs: [check-version, validate-specification]
     if: github.event.action != 'closed' && (github.base_ref == 'dev' && startsWith(github.head_ref, 'feature/'))
     runs-on: ubuntu-latest
     env:
-      NODE_AUTH_TOKEN: ${{ secrets.DEPLOYMENT_TOKEN }}
+      AUTH_TOKEN: ${{ secrets.DEPLOYMENT_TOKEN }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -123,11 +105,11 @@ jobs:
             ❌ Error on publication. Review workflow logs for more information.
 
   publish-package-release:
-    needs: [generate-types, check-version]
+    needs: [check-version, validate-specification]
     if: github.event.action != 'closed' && (github.base_ref == 'main' && startsWith(github.head_ref, 'release/'))
     runs-on: ubuntu-latest
     env:
-      NODE_AUTH_TOKEN: ${{ secrets.DEPLOYMENT_TOKEN }}
+      AUTH_TOKEN: ${{ secrets.DEPLOYMENT_TOKEN }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -163,11 +145,11 @@ jobs:
             ❌ Error on publication. Review workflow logs for more information.
 
   publish-package-main:
-    needs: [generate-types, check-version]
+    needs: [check-version, validate-specification]
     if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     env:
-      NODE_AUTH_TOKEN: ${{ secrets.DEPLOYMENT_TOKEN }}
+      AUTH_TOKEN: ${{ secrets.DEPLOYMENT_TOKEN }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -179,9 +161,8 @@ jobs:
         id: version
         run: |
           BASE_VERSION=${{ needs.check-version.outputs.base_version }}
-          VERSION=${BASE_VERSION}
-          echo "VERSION=$VERSION" >> $GITHUB_ENV
-          echo "new_version=$VERSION" >> $GITHUB_OUTPUT
+          echo "BASE_VERSION=$BASE_VERSION" >> $GITHUB_ENV
+          echo "new_version=$BASE_VERSION" >> $GITHUB_OUTPUT
       - name: Publish package
         run: |
           npm publish --tag latest --access public

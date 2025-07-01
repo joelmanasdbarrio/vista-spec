@@ -1,7 +1,7 @@
 openapi: 3.0.4
 info:
   title: Vista API
-  version: 1.1.1
+  version: 1.1.2
   contact:
     name: Joel Mañas del Barrio
     email: joelmanasdbarrio@gmail.com
@@ -49,9 +49,7 @@ paths:
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/AccountDTO'
+                $ref: '#/components/schemas/PaginatedAccountsResponse'
         '400':
           $ref: '#/components/responses/BadRequestError'
         '401':
@@ -176,7 +174,7 @@ paths:
         - Accounts
       summary: Get account followers
       operationId: getAccountFollowers
-      description: Get account followers
+      description: Get all account followers
       security:
         - bearerAuth: []
       parameters:
@@ -189,9 +187,7 @@ paths:
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/AccountPersonalDTO'
+                $ref: '#/components/schemas/PaginatedAccountsResponse'
         '401':
           $ref: '#/components/responses/UnauthorizedError'
         '404':
@@ -206,7 +202,7 @@ paths:
         - Accounts
       summary: Get account followings
       operationId: getAccountFollowings
-      description: Get account followings
+      description: Get all account followings
       security:
         - bearerAuth: []
       parameters:
@@ -219,9 +215,7 @@ paths:
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/AccountDTO'
+                $ref: '#/components/schemas/PaginatedAccountsResponse'
         '401':
           $ref: '#/components/responses/UnauthorizedError'
         '404':
@@ -325,9 +319,7 @@ paths:
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/FollowRequestDTO'
+                $ref: '#/components/schemas/PaginatedFollowRequestsResponse'
         '401':
           $ref: '#/components/responses/UnauthorizedError'
         '403':
@@ -429,9 +421,7 @@ paths:
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/NotificationDTO'
+                $ref: '#/components/schemas/PaginatedNotificationsResponse'
         '401':
           $ref: '#/components/responses/UnauthorizedError'
         '403':
@@ -499,9 +489,7 @@ paths:
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/ActivityDTO'
+                $ref: '#/components/schemas/PaginatedActivitiesResponse'
         '401':
           $ref: '#/components/responses/UnauthorizedError'
         '403':
@@ -636,9 +624,7 @@ paths:
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/ActivityParticipantDTO'
+                $ref: '#/components/schemas/PaginatedActivityParticipantsResponse'
         '401':
           $ref: '#/components/responses/UnauthorizedError'
         '404':
@@ -708,9 +694,7 @@ paths:
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/ActivityCategoryDTO'
+                $ref: '#/components/schemas/PaginatedActivityCategoriesResponse'
         '401':
           $ref: '#/components/responses/UnauthorizedError'
         '403':
@@ -735,9 +719,7 @@ paths:
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/EstablishmentDTO'
+                $ref: '#/components/schemas/PaginatedEstablishmentsResponse'
         '401':
           $ref: '#/components/responses/UnauthorizedError'
         '403':
@@ -868,9 +850,7 @@ paths:
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/EstablishmentRequestDTO'
+                $ref: '#/components/schemas/PaginatedEstablishmentRequestsResponse'
         '401':
           $ref: '#/components/responses/UnauthorizedError'
         '403':
@@ -1389,6 +1369,93 @@ components:
         updatedAt:
           type: string
           format: date-time
+    PaginatedResponse:
+      type: object
+      properties:
+        page:
+          type: integer
+          example: 1
+        limit:
+          type: integer
+          example: 10
+        results:
+          type: integer
+          example: 0
+        total:
+          type: integer
+          example: 0
+    PaginatedAccountsResponse:
+      allOf:
+        - type: object
+          properties:
+            data:
+              type: array
+              items:
+                $ref: '#/components/schemas/AccountDTO'
+        - $ref: '#/components/schemas/PaginatedResponse'
+    PaginatedActivitiesResponse:
+      allOf:
+        - type: object
+          properties:
+            data:
+              type: array
+              items:
+                $ref: '#/components/schemas/ActivityDTO'
+        - $ref: '#/components/schemas/PaginatedResponse'
+    PaginatedNotificationsResponse:
+      allOf:
+        - type: object
+          properties:
+            data:
+              type: array
+              items:
+                $ref: '#/components/schemas/NotificationDTO'
+        - $ref: '#/components/schemas/PaginatedResponse'
+    PaginatedEstablishmentsResponse:
+      allOf:
+        - type: object
+          properties:
+            data:
+              type: array
+              items:
+                $ref: '#/components/schemas/EstablishmentDTO'
+        - $ref: '#/components/schemas/PaginatedResponse'
+    PaginatedEstablishmentRequestsResponse:
+      allOf:
+        - type: object
+          properties:
+            data:
+              type: array
+              items:
+                $ref: '#/components/schemas/EstablishmentRequestDTO'
+        - $ref: '#/components/schemas/PaginatedResponse'
+    PaginatedActivityCategoriesResponse:
+      allOf:
+        - type: object
+          properties:
+            data:
+              type: array
+              items:
+                $ref: '#/components/schemas/ActivityCategoryDTO'
+        - $ref: '#/components/schemas/PaginatedResponse'
+    PaginatedActivityParticipantsResponse:
+      allOf:
+        - type: object
+          properties:
+            data:
+              type: array
+              items:
+                $ref: '#/components/schemas/ActivityParticipantDTO'
+        - $ref: '#/components/schemas/PaginatedResponse'
+    PaginatedFollowRequestsResponse:
+      allOf:
+        - type: object
+          properties:
+            data:
+              type: array
+              items:
+                $ref: '#/components/schemas/FollowRequestDTO'
+        - $ref: '#/components/schemas/PaginatedResponse'
   securitySchemes:
     bearerAuth:
       type: http
@@ -1583,9 +1650,19 @@ components:
               message:
                 type: string
                 example: Bad Request
-              code:
+              error:
                 type: string
                 example: BAD_REQUEST
+              errors:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    code:
+                      type: string
+                      example: 010020
+                    message:
+                      type: string
               status:
                 type: integer
                 format: int32
@@ -1600,7 +1677,7 @@ components:
               message:
                 type: string
                 example: Unauthorized
-              code:
+              error:
                 type: string
                 example: UNAUTHORIZED
               status:
@@ -1617,7 +1694,7 @@ components:
               message:
                 type: string
                 example: Forbidden
-              code:
+              error:
                 type: string
                 example: FORBIDDEN
               status:
@@ -1634,7 +1711,7 @@ components:
               message:
                 type: string
                 example: Not Found
-              code:
+              error:
                 type: string
                 example: NOT_FOUND
               status:
@@ -1651,7 +1728,7 @@ components:
               message:
                 type: string
                 example: Internal Server Error
-              code:
+              error:
                 type: string
                 example: INTERNAL_SERVER_ERROR
               status:
