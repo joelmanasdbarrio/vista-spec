@@ -7,9 +7,7 @@
   },
   "version": "1.1.2",
   "main": "openapi/openapi-rest.yaml",
-  "types": "types/index.d.ts",
   "files": [
-    "types/index.d.ts",
     "openapi/openapi-rest.yaml"
   ],
   "scripts": {
