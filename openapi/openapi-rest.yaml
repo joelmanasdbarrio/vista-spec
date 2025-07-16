@@ -40,14 +40,53 @@ paths:
       security:
         - bearerAuth: []
       parameters:
+        - $ref: '#/components/parameters/pageParam'
+        - $ref: '#/components/parameters/limitParam'
         - $ref: '#/components/parameters/accountTypeParam'
         - $ref: '#/components/parameters/accountNameParam'
         - $ref: '#/components/parameters/accountUsernameParam'
       responses:
         '200':
-          $ref: '#/components/responses/AccountsResponse'
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccountsResponse'
+        '400':
+          $ref: '#/components/responses/BadRequestError'
         '401':
           $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    patch:
+      tags:
+        - Accounts
+      summary: Update account
+      operationId: updateAccount
+      description: Update one account
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AccountDTO'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccountResponse'
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
         '403':
           $ref: '#/components/responses/ForbiddenError'
         '500':
@@ -65,36 +104,11 @@ paths:
         - $ref: '#/components/parameters/accountIdParam'
       responses:
         '200':
-          $ref: '#/components/responses/AccountResponse'
-        '401':
-          $ref: '#/components/responses/UnauthorizedError'
-        '404':
-          $ref: '#/components/responses/NotFoundError'
-        '403':
-          $ref: '#/components/responses/ForbiddenError'
-        '500':
-          $ref: '#/components/responses/InternalServerError'
-    patch:
-      tags:
-        - Accounts
-      summary: Update account
-      operationId: updateAccount
-      description: Update one account
-      security:
-        - bearerAuth: []
-      parameters:
-        - $ref: '#/components/parameters/accountIdParam'
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/AccountDTO'
-      responses:
-        '200':
-          $ref: '#/components/responses/AccountResponse'
-        '400':
-          $ref: '#/components/responses/BadRequestError'
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccountResponse'
         '401':
           $ref: '#/components/responses/UnauthorizedError'
         '404':
@@ -135,11 +149,17 @@ paths:
         - bearerAuth: []
       parameters:
         - $ref: '#/components/parameters/accountIdParam'
+        - $ref: '#/components/parameters/pageParam'
+        - $ref: '#/components/parameters/limitParam'
         - $ref: '#/components/parameters/establishmentNameParam'
         - $ref: '#/components/parameters/establishmentAddressParam'
       responses:
         '200':
-          $ref: '#/components/responses/EstablishmentsResponse'
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EstablishmentsResponse'
         '401':
           $ref: '#/components/responses/UnauthorizedError'
         '404':
@@ -159,11 +179,17 @@ paths:
         - bearerAuth: []
       parameters:
         - $ref: '#/components/parameters/accountIdParam'
+        - $ref: '#/components/parameters/pageParam'
+        - $ref: '#/components/parameters/limitParam'
         - $ref: '#/components/parameters/accountNameParam'
         - $ref: '#/components/parameters/accountUsernameParam'
       responses:
         '200':
-          $ref: '#/components/responses/AccountPersonalResponse'
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccountsPersonalResponse'
         '401':
           $ref: '#/components/responses/UnauthorizedError'
         '404':
@@ -183,11 +209,17 @@ paths:
         - bearerAuth: []
       parameters:
         - $ref: '#/components/parameters/accountIdParam'
+        - $ref: '#/components/parameters/pageParam'
+        - $ref: '#/components/parameters/limitParam'
         - $ref: '#/components/parameters/accountNameParam'
         - $ref: '#/components/parameters/accountUsernameParam'
       responses:
         '200':
-          $ref: '#/components/responses/AccountsResponse'
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccountsResponse'
         '401':
           $ref: '#/components/responses/UnauthorizedError'
         '404':
@@ -209,7 +241,11 @@ paths:
         - $ref: '#/components/parameters/accountIdParam'
       responses:
         '201':
-          $ref: '#/components/responses/FollowResponse'
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FollowResponse'
         '401':
           $ref: '#/components/responses/UnauthorizedError'
         '404':
@@ -236,7 +272,11 @@ paths:
               $ref: '#/components/schemas/FollowDTO'
       responses:
         '200':
-          $ref: '#/components/responses/FollowResponse'
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FollowResponse'
         '400':
           $ref: '#/components/responses/BadRequestError'
         '401':
@@ -277,9 +317,16 @@ paths:
       description: Get all follow requests
       security:
         - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/pageParam'
+        - $ref: '#/components/parameters/limitParam'
       responses:
         '200':
-          $ref: '#/components/responses/FollowRequestsResponse'
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FollowRequestsResponse'
         '401':
           $ref: '#/components/responses/UnauthorizedError'
         '403':
@@ -299,7 +346,11 @@ paths:
         - $ref: '#/components/parameters/followRequestIdParam'
       responses:
         '200':
-          $ref: '#/components/responses/FollowRequestResponse'
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FollowRequestResponse'
         '401':
           $ref: '#/components/responses/UnauthorizedError'
         '404':
@@ -326,7 +377,11 @@ paths:
               $ref: '#/components/schemas/FollowRequestDTO'
       responses:
         '200':
-          $ref: '#/components/responses/FollowRequestResponse'
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FollowRequestResponse'
         '400':
           $ref: '#/components/responses/BadRequestError'
         '401':
@@ -367,9 +422,16 @@ paths:
       description: Get all notifications
       security:
         - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/pageParam'
+        - $ref: '#/components/parameters/limitParam'
       responses:
         '200':
-          $ref: '#/components/responses/NotificationsResponse'
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotificationsResponse'
         '401':
           $ref: '#/components/responses/UnauthorizedError'
         '403':
@@ -395,7 +457,11 @@ paths:
               $ref: '#/components/schemas/NotificationDTO'
       responses:
         '200':
-          $ref: '#/components/responses/NotificationResponse'
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotificationResponse'
         '401':
           $ref: '#/components/responses/UnauthorizedError'
         '404':
@@ -414,6 +480,8 @@ paths:
       security:
         - bearerAuth: []
       parameters:
+        - $ref: '#/components/parameters/pageParam'
+        - $ref: '#/components/parameters/limitParam'
         - $ref: '#/components/parameters/activityTypeParam'
         - $ref: '#/components/parameters/activityTitleParam'
         - $ref: '#/components/parameters/activityDescriptionParam'
@@ -429,7 +497,11 @@ paths:
         - $ref: '#/components/parameters/activityLanguageParam'
       responses:
         '200':
-          $ref: '#/components/responses/ActivitiesResponse'
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ActivitiesResponse'
         '401':
           $ref: '#/components/responses/UnauthorizedError'
         '403':
@@ -452,7 +524,11 @@ paths:
               $ref: '#/components/schemas/ActivityDTO'
       responses:
         '201':
-          $ref: '#/components/responses/ActivityResponse'
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ActivityResponse'
         '400':
           $ref: '#/components/responses/BadRequestError'
         '401':
@@ -474,7 +550,11 @@ paths:
         - $ref: '#/components/parameters/activityIdParam'
       responses:
         '200':
-          $ref: '#/components/responses/ActivityResponse'
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ActivityResponse'
         '401':
           $ref: '#/components/responses/UnauthorizedError'
         '404':
@@ -501,7 +581,11 @@ paths:
               $ref: '#/components/schemas/ActivityDTO'
       responses:
         '200':
-          $ref: '#/components/responses/ActivityResponse'
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ActivityResponse'
         '400':
           $ref: '#/components/responses/BadRequestError'
         '401':
@@ -544,11 +628,17 @@ paths:
         - bearerAuth: []
       parameters:
         - $ref: '#/components/parameters/activityIdParam'
+        - $ref: '#/components/parameters/pageParam'
+        - $ref: '#/components/parameters/limitParam'
         - $ref: '#/components/parameters/accountNameParam'
         - $ref: '#/components/parameters/accountUsernameParam'
       responses:
         '200':
-          $ref: '#/components/responses/AccountsResponse'
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ActivityParticipantsResponse'
         '401':
           $ref: '#/components/responses/UnauthorizedError'
         '404':
@@ -569,7 +659,11 @@ paths:
         - $ref: '#/components/parameters/activityIdParam'
       responses:
         '201':
-          $ref: '#/components/responses/ActivityParticipantsResponse'
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ActivityParticipantResponse'
         '401':
           $ref: '#/components/responses/UnauthorizedError'
         '404':
@@ -610,7 +704,11 @@ paths:
         - bearerAuth: []
       responses:
         '200':
-          $ref: '#/components/responses/ActivityCategoriesResponse'
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ActivityCategoriesResponse'
         '401':
           $ref: '#/components/responses/UnauthorizedError'
         '403':
@@ -627,11 +725,17 @@ paths:
       security:
         - bearerAuth: []
       parameters:
+        - $ref: '#/components/parameters/pageParam'
+        - $ref: '#/components/parameters/limitParam'
         - $ref: '#/components/parameters/establishmentNameParam'
         - $ref: '#/components/parameters/establishmentAddressParam'
       responses:
         '200':
-          $ref: '#/components/responses/EstablishmentsResponse'
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EstablishmentsResponse'
         '401':
           $ref: '#/components/responses/UnauthorizedError'
         '403':
@@ -654,7 +758,11 @@ paths:
               $ref: '#/components/schemas/EstablishmentDTO'
       responses:
         '201':
-          $ref: '#/components/responses/EstablishmentResponse'
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EstablishmentResponse'
         '400':
           $ref: '#/components/responses/BadRequestError'
         '401':
@@ -676,7 +784,11 @@ paths:
         - $ref: '#/components/parameters/establishmentIdParam'
       responses:
         '200':
-          $ref: '#/components/responses/EstablishmentResponse'
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EstablishmentResponse'
         '401':
           $ref: '#/components/responses/UnauthorizedError'
         '404':
@@ -703,7 +815,11 @@ paths:
               $ref: '#/components/schemas/EstablishmentDTO'
       responses:
         '200':
-          $ref: '#/components/responses/EstablishmentResponse'
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EstablishmentResponse'
         '400':
           $ref: '#/components/responses/BadRequestError'
         '401':
@@ -735,7 +851,7 @@ paths:
           $ref: '#/components/responses/ForbiddenError'
         '500':
           $ref: '#/components/responses/InternalServerError'
-  /establishments/requests:
+  /establishments/{id}/requests:
     get:
       tags:
         - Establishments
@@ -744,9 +860,17 @@ paths:
       description: Get all establishment requests
       security:
         - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/establishmentIdParam'
+        - $ref: '#/components/parameters/pageParam'
+        - $ref: '#/components/parameters/limitParam'
       responses:
         '200':
-          $ref: '#/components/responses/EstablishmentRequestsResponse'
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EstablishmentRequestsResponse'
         '401':
           $ref: '#/components/responses/UnauthorizedError'
         '403':
@@ -761,6 +885,8 @@ paths:
       description: Create establishment request
       security:
         - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/establishmentIdParam'
       requestBody:
         required: true
         content:
@@ -769,7 +895,11 @@ paths:
               $ref: '#/components/schemas/EstablishmentRequestDTO'
       responses:
         '201':
-          $ref: '#/components/responses/EstablishmentRequestResponse'
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EstablishmentRequestResponse'
         '400':
           $ref: '#/components/responses/BadRequestError'
         '401':
@@ -778,7 +908,7 @@ paths:
           $ref: '#/components/responses/ForbiddenError'
         '500':
           $ref: '#/components/responses/InternalServerError'
-  /establishments/requests/{id}:
+  /establishments/{id}/requests/{requestId}:
     patch:
       tags:
         - Establishments
@@ -788,6 +918,7 @@ paths:
       security:
         - bearerAuth: []
       parameters:
+        - $ref: '#/components/parameters/establishmentIdParam'
         - $ref: '#/components/parameters/establishmentRequestIdParam'
       requestBody:
         required: true
@@ -797,7 +928,11 @@ paths:
               $ref: '#/components/schemas/EstablishmentRequestDTO'
       responses:
         '200':
-          $ref: '#/components/responses/EstablishmentRequestResponse'
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EstablishmentRequestResponse'
         '400':
           $ref: '#/components/responses/BadRequestError'
         '401':
@@ -817,6 +952,7 @@ paths:
       security:
         - bearerAuth: []
       parameters:
+        - $ref: '#/components/parameters/establishmentIdParam'
         - $ref: '#/components/parameters/establishmentRequestIdParam'
       responses:
         '204':
@@ -836,14 +972,14 @@ components:
         - $ref: '#/components/schemas/AccountPersonalDTO'
         - $ref: '#/components/schemas/AccountEnterpriseDTO'
       discriminator:
-        propertyName: type
+        propertyName: accountType
     AccountPersonalDTO:
       allOf:
         - $ref: '#/components/schemas/AccountBase'
       type: object
       required:
         - gender
-        - type
+        - accountType
       properties:
         gender:
           type: string
@@ -855,29 +991,28 @@ components:
         birthdate:
           type: string
           format: date
-        type:
+        accountType:
           type: string
-          enum:
-            - personal
+          enum: [personal]
           default: personal
     AccountEnterpriseDTO:
       allOf:
         - $ref: '#/components/schemas/AccountBase'
       type: object
       required:
-        - type
+        - accountType
       properties:
         isVerified:
           type: boolean
           default: false
-        type:
+        accountType:
           type: string
-          enum:
-            - enterprise
+          enum: [enterprise]
           default: enterprise
     AccountBase:
       type: object
       required:
+        - id
         - name
         - username
         - email
@@ -1052,30 +1187,30 @@ components:
         - $ref: '#/components/schemas/ActivityOnsiteDTO'
         - $ref: '#/components/schemas/ActivityOnlineDTO'
       discriminator:
-        propertyName: type
+        propertyName: activityType
     ActivityOnsiteDTO:
       allOf:
         - $ref: '#/components/schemas/ActivityBase'
       type: object
       required:
         - location
-        - type
+        - activityType
       properties:
         location:
           oneOf:
             - $ref: '#/components/schemas/EstablishmentDTO'
             - $ref: '#/components/schemas/AddressDTO'
-        type:
+        activityType:
           type: string
-          enum:
-            - onsite
+          enum: [onsite]
+          default: onsite
     ActivityOnlineDTO:
       allOf:
         - $ref: '#/components/schemas/ActivityBase'
       type: object
       required:
         - location
-        - type
+        - activityType
       properties:
         location:
           type: object
@@ -1084,10 +1219,10 @@ components:
           properties:
             url:
               type: string
-        type:
+        activityType:
           type: string
-          enum:
-            - online
+          enum: [online]
+          default: online
     ActivityBase:
       type: object
       required:
@@ -1258,27 +1393,288 @@ components:
         updatedAt:
           type: string
           format: date-time
-    PaginatedResponse:
+    # Paginated DTOs
+    PaginatedDTO:
       type: object
       properties:
-        page:
-          type: integer
-          example: 1
-        limit:
-          type: integer
-          example: 10
-        results:
-          type: integer
-          example: 0
-        total:
-          type: integer
-          example: 0
+        _meta:
+          type: object
+          properties:
+            page:
+              type: integer
+              example: 1
+            limit:
+              type: integer
+              example: 10
+            results:
+              type: integer
+              example: 0
+            total:
+              type: integer
+              example: 0
+    AccountsPaginatedDTO:
+      allOf:
+        - type: object
+          required: [data]
+          properties:
+            data:
+              type: array
+              items:
+                $ref: '#/components/schemas/AccountDTO'
+        - $ref: '#/components/schemas/PaginatedDTO'
+    AccountsPersonalPaginatedDTO:
+      allOf:
+        - type: object
+          required: [data]
+          properties:
+            data:
+              type: array
+              items:
+                $ref: '#/components/schemas/AccountPersonalDTO'
+        - $ref: '#/components/schemas/PaginatedDTO'
+    FollowRequestsPaginatedDTO:
+      allOf:
+        - type: object
+          required: [data]
+          properties:
+            data:
+              type: array
+              items:
+                $ref: '#/components/schemas/FollowRequestDTO'
+        - $ref: '#/components/schemas/PaginatedDTO'
+    NotificationsPaginatedDTO:
+      allOf:
+        - type: object
+          required: [data]
+          properties:
+            data:
+              type: array
+              items:
+                $ref: '#/components/schemas/NotificationDTO'
+        - $ref: '#/components/schemas/PaginatedDTO'
+    ActivitiesPaginatedDTO:
+      allOf:
+        - type: object
+          required: [data]
+          properties:
+            data:
+              type: array
+              items:
+                $ref: '#/components/schemas/ActivityDTO'
+        - $ref: '#/components/schemas/PaginatedDTO'
+    EstablishmentsPaginatedDTO:
+      allOf:
+        - type: object
+          required: [data]
+          properties:
+            data:
+              type: array
+              items:
+                $ref: '#/components/schemas/EstablishmentDTO'
+        - $ref: '#/components/schemas/PaginatedDTO'
+    EstablishmentRequestsPaginatedDTO:
+      allOf:
+        - type: object
+          required: [data]
+          properties:
+            data:
+              type: array
+              items:
+                $ref: '#/components/schemas/EstablishmentRequestDTO'
+        - $ref: '#/components/schemas/PaginatedDTO'
+# Responses
+    AccountsResponse:
+      allOf:
+        - type: object
+          properties:
+            status:
+              type: string
+              enum: [success]
+              default: success
+        - $ref: '#/components/schemas/AccountsPaginatedDTO'
+    AccountsPersonalResponse:
+      allOf:
+        - type: object
+          properties:
+            status:
+              type: string
+              enum: [success]
+              default: success
+        - $ref: '#/components/schemas/AccountsPersonalPaginatedDTO'
+    AccountResponse:
+      type: object
+      required: [data]
+      properties:
+        status:
+          type: string
+          enum: [success]
+          default: success
+        data:
+          $ref: '#/components/schemas/AccountDTO'
+    FollowResponse:
+      type: object
+      required: [data]
+      properties:
+        status:
+          type: string
+          enum: [success]
+          default: success
+        data:
+          $ref: '#/components/schemas/FollowDTO'
+    FollowRequestsResponse:
+      allOf:
+        - type: object
+          required: [data]
+          properties:
+            status:
+              type: string
+              enum: [success]
+              default: success
+        - $ref: '#/components/schemas/FollowRequestsPaginatedDTO'
+    FollowRequestResponse:
+      type: object
+      required: [data]
+      properties:
+        status:
+          type: string
+          enum: [success]
+          default: success
+        data:
+          $ref: '#/components/schemas/FollowRequestDTO'
+    NotificationsResponse:
+      allOf:
+        - type: object
+          required: [data]
+          properties:
+            status:
+              type: string
+              enum: [success]
+              default: success
+        - $ref: '#/components/schemas/NotificationsPaginatedDTO'
+    NotificationResponse:
+      type: object
+      required: [data]
+      properties:
+        status:
+          type: string
+          enum: [success]
+          default: success
+        data:
+          $ref: '#/components/schemas/NotificationDTO'
+    ActivitiesResponse:
+      allOf:
+        - type: object
+          required: [data]
+          properties:
+            status:
+              type: string
+              enum: [success]
+              default: success
+        - $ref: '#/components/schemas/ActivitiesPaginatedDTO'
+    ActivityResponse:
+      type: object
+      required: [data]
+      properties:
+        status:
+          type: string
+          enum: [success]
+          default: success
+        data:
+          $ref: '#/components/schemas/ActivityDTO'
+    ActivityParticipantsResponse:
+      allOf:
+        - type: object
+          required: [data]
+          properties:
+            status:
+              type: string
+              enum: [success]
+              default: success
+        - $ref: '#/components/schemas/AccountsPersonalPaginatedDTO'
+    ActivityParticipantResponse:
+      type: object
+      required: [data]
+      properties:
+        status:
+          type: string
+          enum: [success]
+          default: success
+        data:
+          $ref: '#/components/schemas/ActivityParticipantDTO'
+    ActivityCategoriesResponse:
+      type: object
+      required: [data]
+      properties:
+        status:
+          type: string
+          enum: [success]
+          default: success
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/ActivityCategoryDTO'
+    EstablishmentsResponse:
+      allOf:
+        - type: object
+          required: [data]
+          properties:
+            status:
+              type: string
+              enum: [success]
+              default: success
+        - $ref: '#/components/schemas/EstablishmentsPaginatedDTO'
+    EstablishmentResponse:
+      type: object
+      required: [data]
+      properties:
+        status:
+          type: string
+          enum: [success]
+          default: success
+        data:
+          $ref: '#/components/schemas/EstablishmentDTO'
+    EstablishmentRequestsResponse:
+      allOf:
+        - type: object
+          required: [data]
+          properties:
+            status:
+              type: string
+              enum: [success]
+              default: success
+        - $ref: '#/components/schemas/EstablishmentRequestsPaginatedDTO'
+    EstablishmentRequestResponse:
+      type: object
+      required: [data]
+      properties:
+        status:
+          type: string
+          enum: [success]
+          default: success
+        data:
+          $ref: '#/components/schemas/EstablishmentRequestDTO'
   securitySchemes:
     bearerAuth:
       type: http
       scheme: bearer
       bearerFormat: JWT
   parameters:
+    pageParam:
+      name: page
+      description: Page number for pagination
+      in: query
+      schema:
+        type: integer
+        format: int32
+        default: 1
+    limitParam:
+      name: limit
+      description: Number of items per page for pagination
+      in: query
+      schema:
+        type: integer
+        format: int32
+        default: 10
     accountIdParam:
       name: id
       description: Account ID
@@ -1351,7 +1747,7 @@ components:
       schema:
         type: string
     establishmentRequestIdParam:
-      name: id
+      name: requestId
       description: Establishment request ID
       in: path
       required: true
@@ -1457,262 +1853,6 @@ components:
         type: integer
         format: int32
   responses:
-    AccountsResponse:
-      description: OK
-      content:
-        application/json:
-          schema:
-            allOf:
-              - type: object
-                properties:
-                  status:
-                    type: string
-                    enum: [success]
-                    default: success
-                  data:
-                    type: array
-                    default: []
-                    items:
-                      $ref: '#/components/schemas/AccountDTO'
-              - $ref: '#/components/schemas/PaginatedResponse'
-    AccountPersonalResponse:
-      description: OK
-      content:
-        application/json:
-          schema:
-            allOf:
-              - type: object
-                properties:
-                  status:
-                    type: string
-                    enum: [success]
-                    default: success
-                  data:
-                    $ref: '#/components/schemas/AccountPersonalDTO'
-    AccountResponse:
-      description: OK
-      content:
-        application/json:
-          schema:
-            allOf:
-              - type: object
-                properties:
-                  status:
-                    type: string
-                    enum: [success]
-                    default: success
-                  data:
-                    $ref: '#/components/schemas/AccountDTO'
-    FollowResponse:
-      description: OK
-      content:
-        application/json:
-          schema:
-            allOf:
-              - type: object
-                properties:
-                  status:
-                    type: string
-                    enum: [success]
-                    default: success
-                  data:
-                    $ref: '#/components/schemas/FollowDTO'
-    FollowRequestsResponse:
-      description: OK
-      content:
-        application/json:
-          schema:
-            allOf:
-              - type: object
-                properties:
-                  status:
-                    type: string
-                    enum: [success]
-                    default: success
-                  data:
-                    type: array
-                    default: []
-                    items:
-                      $ref: '#/components/schemas/FollowRequestDTO'
-              - $ref: '#/components/schemas/PaginatedResponse'
-    FollowRequestResponse:
-      description: OK
-      content:
-        application/json:
-          schema:
-            allOf:
-              - type: object
-                properties:
-                  status:
-                    type: string
-                    enum: [success]
-                    default: success
-                  data:
-                    $ref: '#/components/schemas/FollowRequestDTO'
-    NotificationsResponse:
-      description: OK
-      content:
-        application/json:
-          schema:
-            allOf:
-              - type: object
-                properties:
-                  status:
-                    type: string
-                    enum: [success]
-                    default: success
-                  data:
-                    type: array
-                    default: []
-                    items:
-                      $ref: '#/components/schemas/NotificationDTO'
-              - $ref: '#/components/schemas/PaginatedResponse'
-    NotificationResponse:
-      description: OK
-      content:
-        application/json:
-          schema:
-            allOf:
-              - type: object
-                properties:
-                  status:
-                    type: string
-                    enum: [success]
-                    default: success
-                  data:
-                    $ref: '#/components/schemas/NotificationDTO'
-    ActivitiesResponse:
-      description: OK
-      content:
-        application/json:
-          schema:
-            allOf:
-              - type: object
-                properties:
-                  status:
-                    type: string
-                    enum: [success]
-                    default: success
-                  data:
-                    type: array
-                    default: []
-                    items:
-                      $ref: '#/components/schemas/ActivityDTO'
-              - $ref: '#/components/schemas/PaginatedResponse'
-    ActivityResponse:
-      description: OK
-      content:
-        application/json:
-          schema:
-            allOf:
-              - type: object
-                properties:
-                  status:
-                    type: string
-                    enum: [success]
-                    default: success
-                  data:
-                    $ref: '#/components/schemas/ActivityDTO'
-    ActivityParticipantsResponse:
-      description: OK
-      content:
-        application/json:
-          schema:
-            allOf:
-              - type: object
-                properties:
-                  status:
-                    type: string
-                    enum: [success]
-                    default: success
-                  data:
-                    type: array
-                    default: []
-                    items:
-                      $ref: '#/components/schemas/ActivityParticipantDTO'
-              - $ref: '#/components/schemas/PaginatedResponse'
-    ActivityCategoriesResponse:
-      description: OK
-      content:
-        application/json:
-          schema:
-            allOf:
-              - type: object
-                properties:
-                  status:
-                    type: string
-                    enum: [success]
-                    default: success
-                  data:
-                    type: array
-                    default: []
-                    items:
-                      $ref: '#/components/schemas/ActivityCategoryDTO'
-              - $ref: '#/components/schemas/PaginatedResponse'
-    EstablishmentsResponse:
-      description: OK
-      content:
-        application/json:
-          schema:
-            allOf:
-              - type: object
-                properties:
-                  status:
-                    type: string
-                    enum: [success]
-                    default: success
-                  data:
-                    type: array
-                    default: []
-                    items:
-                      $ref: '#/components/schemas/EstablishmentDTO'
-              - $ref: '#/components/schemas/PaginatedResponse'
-    EstablishmentResponse:
-      description: OK
-      content:
-        application/json:
-          schema:
-            allOf:
-              - type: object
-                properties:
-                  status:
-                    type: string
-                    enum: [success]
-                    default: success
-                  data:
-                    $ref: '#/components/schemas/EstablishmentDTO'
-    EstablishmentRequestsResponse:
-      description: OK
-      content:
-        application/json:
-          schema:
-            allOf:
-              - type: object
-                properties:
-                  status:
-                    type: string
-                    enum: [success]
-                    default: success
-                  data:
-                    type: array
-                    default: []
-                    items:
-                      $ref: '#/components/schemas/EstablishmentRequestDTO'
-              - $ref: '#/components/schemas/PaginatedResponse'
-    EstablishmentRequestResponse:
-      description: OK
-      content:
-        application/json:
-          schema:
-            allOf:
-              - type: object
-                properties:
-                  status:
-                    type: string
-                    enum: [success]
-                    default: success
-                  data:
-                    $ref: '#/components/schemas/EstablishmentRequestDTO'
     BadRequestError:
       description: Bad Request
       content:
@@ -1730,7 +1870,6 @@ components:
                 example: 400
               errors:
                 type: array
-                default: []
                 items:
                   type: object
                   properties:
