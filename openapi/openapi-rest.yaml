@@ -729,6 +729,7 @@ paths:
         - $ref: '#/components/parameters/limitParam'
         - $ref: '#/components/parameters/establishmentNameParam'
         - $ref: '#/components/parameters/establishmentAddressParam'
+        - $ref: '#/components/parameters/establishmentOwnerParam'
       responses:
         '200':
           description: OK
@@ -1749,6 +1750,13 @@ components:
       in: query
       schema:
         type: string
+    establishmentOwnerParam:
+      name: owner
+      description: Establishment owner ID
+      in: query
+      schema:
+        type: string
+        format: uuid
     establishmentRequestIdParam:
       name: requestId
       description: Establishment request ID
