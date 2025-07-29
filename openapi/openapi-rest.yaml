@@ -1173,7 +1173,17 @@ components:
         location:
           oneOf:
             - $ref: '#/components/schemas/EstablishmentDTO'
-            - $ref: '#/components/schemas/AddressDTO'
+            - type: object
+              properties:
+                coordinates:
+                  type: object
+                  properties:
+                    latitude:
+                      type: number
+                      format: double
+                    longitude:
+                      type: number
+                      format: double
         activityType:
           type: string
           enum: [onsite]
