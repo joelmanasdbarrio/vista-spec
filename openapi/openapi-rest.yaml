@@ -467,6 +467,7 @@ paths:
         - $ref: '#/components/parameters/activityMaxParcipantsQueryParam'
         - $ref: '#/components/parameters/activityMinEntriesQueryParam'
         - $ref: '#/components/parameters/activityMaxEntriesQueryParam'
+        - $ref: '#/components/parameters/activityGeolocationQueryParam'
         - $ref: '#/components/parameters/activityLanguageQueryParam'
       responses:
         '200':
@@ -1843,6 +1844,23 @@ components:
       schema:
         type: integer
         format: int32
+    activityGeolocationQueryParam:
+      name: geolocation
+      description: Activity geolocation
+      in: query
+      schema:
+        type: object
+        properties:
+          latitude:
+            type: number
+            format: double
+          longitude:
+            type: number
+            format: double
+          radius:
+            type: number
+            format: double
+            default: 1000
   responses:
     BadRequestError:
       description: Bad Request
