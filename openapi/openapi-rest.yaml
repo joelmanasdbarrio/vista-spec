@@ -1031,9 +1031,15 @@ components:
           type: string
           format: uuid
         follower:
-          $ref: '#/components/schemas/AccountPersonalDTO'
+          oneOf:
+            - type: string
+              format: uuid
+            - $ref: '#/components/schemas/AccountPersonalDTO'
         following:
-          $ref: '#/components/schemas/AccountDTO'
+          oneOf:
+            - type: string
+              format: uuid
+            - $ref: '#/components/schemas/AccountDTO'
         isMuted:
           type: boolean
           default: true
@@ -1055,9 +1061,15 @@ components:
           type: string
           format: uuid
         requestFrom:
-          $ref: '#/components/schemas/AccountPersonalDTO'
+          oneOf:
+            - type: string
+              format: uuid
+            - $ref: '#/components/schemas/AccountPersonalDTO'
         requestTo:
-          $ref: '#/components/schemas/AccountDTO'
+          oneOf:
+            - type: string
+              format: uuid
+            - $ref: '#/components/schemas/AccountDTO'
         status:
           type: string
           enum:
@@ -1099,11 +1111,20 @@ components:
           type: boolean
           default: false
         owner:
-          $ref: '#/components/schemas/AccountDTO'
+          oneOf:
+            - type: string
+              format: uuid
+            - $ref: '#/components/schemas/AccountDTO'
         relatedAccount:
-          $ref: '#/components/schemas/AccountDTO'
+          oneOf:
+            - type: string
+              format: uuid
+            - $ref: '#/components/schemas/AccountDTO'
         relatedActivity:
-          $ref: '#/components/schemas/ActivityDTO'
+          oneOf:
+            - type: string
+              format: uuid
+            - $ref: '#/components/schemas/ActivityDTO'
         createdAt:
           type: string
           format: date-time
@@ -1221,9 +1242,15 @@ components:
           type: string
           format: uuid
         owner:
-          $ref: '#/components/schemas/AccountDTO'
+          oneOf:
+            - type: string
+              format: uuid
+            - $ref: '#/components/schemas/AccountDTO'
         category:
-          $ref: '#/components/schemas/ActivityCategoryDTO'
+          oneOf:
+            - type: string
+              format: uuid
+            - $ref: '#/components/schemas/ActivityCategoryDTO'
         title:
           type: string
         description:
@@ -1292,7 +1319,10 @@ components:
           type: string
           format: uuid
         parent:
-          $ref: '#/components/schemas/ActivityCategoryDTO'
+          oneOf:
+            - type: string
+              format: uuid
+            - $ref: '#/components/schemas/ActivityCategoryDTO'
         name:
           type: string
         i18nKey:
@@ -1318,9 +1348,15 @@ components:
           type: string
           format: uuid
         activity:
-          $ref: '#/components/schemas/ActivityDTO'
+          oneOf:
+            - type: string
+              format: uuid
+            - $ref: '#/components/schemas/ActivityDTO'
         account:
-          $ref: '#/components/schemas/AccountPersonalDTO'
+          oneOf:
+            - type: string
+              format: uuid
+            - $ref: '#/components/schemas/AccountPersonalDTO'
         createdAt:
           type: string
           format: date-time
@@ -1338,9 +1374,15 @@ components:
           type: string
           format: uuid
         owner:
-          $ref: '#/components/schemas/AccountEnterpriseDTO'
+          oneOf:
+            - type: string
+              format: uuid
+            - $ref: '#/components/schemas/AccountEnterpriseDTO'
         address:
-          $ref: '#/components/schemas/AddressDTO'
+          oneOf:
+            - type: string
+              format: uuid
+            - $ref: '#/components/schemas/AddressDTO'
         name:
           type: string
         createdAt:
@@ -1359,9 +1401,15 @@ components:
           type: string
           format: uuid
         requestFromActivity:
-          $ref: '#/components/schemas/ActivityOnsiteDTO'
+          oneOf:
+            - type: string
+              format: uuid
+            - $ref: '#/components/schemas/ActivityOnsiteDTO'
         requestToEstablishment:
-          $ref: '#/components/schemas/EstablishmentDTO'
+          oneOf:
+            - type: string
+              format: uuid
+            - $ref: '#/components/schemas/EstablishmentDTO'
         status:
           type: string
           enum:
