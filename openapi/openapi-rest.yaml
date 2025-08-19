@@ -1394,6 +1394,7 @@ components:
       required:
         - requestFromActivity
         - requestToEstablishment
+        - status
       properties:
         id:
           type: string
@@ -1414,6 +1415,7 @@ components:
             - pending
             - approved
             - rejected
+          default: pending
         createdAt:
           type: string
           format: date-time
