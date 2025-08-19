@@ -1162,6 +1162,9 @@ components:
           type: string
         coordinates:
           type: object
+          required:
+            - latitude
+            - longitude
           properties:
             latitude:
               type: number
