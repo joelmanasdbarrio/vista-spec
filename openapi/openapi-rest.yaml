@@ -1194,6 +1194,8 @@ components:
       properties:
         location:
           oneOf:
+            - type: string
+              format: uuid
             - $ref: '#/components/schemas/EstablishmentDTO'
             - type: object
               properties:
