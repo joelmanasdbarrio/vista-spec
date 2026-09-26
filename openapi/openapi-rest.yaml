@@ -1,7 +1,7 @@
 openapi: 3.0.4
 info:
   title: Vista API
-  version: 1.1.2
+  version: 1.1.3
   contact:
     name: Joel Mañas del Barrio
     email: joelmanasdbarrio@gmail.com
@@ -40,11 +40,11 @@ paths:
       security:
         - bearerAuth: []
       parameters:
-        - $ref: '#/components/parameters/pageParam'
-        - $ref: '#/components/parameters/limitParam'
-        - $ref: '#/components/parameters/accountTypeParam'
-        - $ref: '#/components/parameters/accountNameParam'
-        - $ref: '#/components/parameters/accountUsernameParam'
+        - $ref: '#/components/parameters/pageQueryParam'
+        - $ref: '#/components/parameters/limitQueryParam'
+        - $ref: '#/components/parameters/accountTypeQueryParam'
+        - $ref: '#/components/parameters/accountNameQueryParam'
+        - $ref: '#/components/parameters/accountUsernameQueryParam'
       responses:
         '200':
           description: OK
@@ -101,7 +101,7 @@ paths:
       security:
         - bearerAuth: []
       parameters:
-        - $ref: '#/components/parameters/accountIdParam'
+        - $ref: '#/components/parameters/accountIdPathParam'
       responses:
         '200':
           description: OK
@@ -126,40 +126,10 @@ paths:
       security:
         - bearerAuth: []
       parameters:
-        - $ref: '#/components/parameters/accountIdParam'
+        - $ref: '#/components/parameters/accountIdPathParam'
       responses:
         '204':
           description: No Content
-        '401':
-          $ref: '#/components/responses/UnauthorizedError'
-        '404':
-          $ref: '#/components/responses/NotFoundError'
-        '403':
-          $ref: '#/components/responses/ForbiddenError'
-        '500':
-          $ref: '#/components/responses/InternalServerError'
-  /accounts/{id}/establishments:
-    get:
-      tags:
-        - Accounts
-      summary: Get account establishments
-      operationId: getAccountEstablishments
-      description: Get account establishments
-      security:
-        - bearerAuth: []
-      parameters:
-        - $ref: '#/components/parameters/accountIdParam'
-        - $ref: '#/components/parameters/pageParam'
-        - $ref: '#/components/parameters/limitParam'
-        - $ref: '#/components/parameters/establishmentNameParam'
-        - $ref: '#/components/parameters/establishmentAddressParam'
-      responses:
-        '200':
-          description: OK
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/EstablishmentsResponse'
         '401':
           $ref: '#/components/responses/UnauthorizedError'
         '404':
@@ -178,11 +148,11 @@ paths:
       security:
         - bearerAuth: []
       parameters:
-        - $ref: '#/components/parameters/accountIdParam'
-        - $ref: '#/components/parameters/pageParam'
-        - $ref: '#/components/parameters/limitParam'
-        - $ref: '#/components/parameters/accountNameParam'
-        - $ref: '#/components/parameters/accountUsernameParam'
+        - $ref: '#/components/parameters/accountIdPathParam'
+        - $ref: '#/components/parameters/pageQueryParam'
+        - $ref: '#/components/parameters/limitQueryParam'
+        - $ref: '#/components/parameters/accountNameQueryParam'
+        - $ref: '#/components/parameters/accountUsernameQueryParam'
       responses:
         '200':
           description: OK
@@ -208,11 +178,11 @@ paths:
       security:
         - bearerAuth: []
       parameters:
-        - $ref: '#/components/parameters/accountIdParam'
-        - $ref: '#/components/parameters/pageParam'
-        - $ref: '#/components/parameters/limitParam'
-        - $ref: '#/components/parameters/accountNameParam'
-        - $ref: '#/components/parameters/accountUsernameParam'
+        - $ref: '#/components/parameters/accountIdPathParam'
+        - $ref: '#/components/parameters/pageQueryParam'
+        - $ref: '#/components/parameters/limitQueryParam'
+        - $ref: '#/components/parameters/accountNameQueryParam'
+        - $ref: '#/components/parameters/accountUsernameQueryParam'
       responses:
         '200':
           description: OK
@@ -238,7 +208,7 @@ paths:
       security:
         - bearerAuth: []
       parameters:
-        - $ref: '#/components/parameters/accountIdParam'
+        - $ref: '#/components/parameters/accountIdPathParam'
       responses:
         '201':
           description: Created
@@ -263,7 +233,7 @@ paths:
       security:
         - bearerAuth: []
       parameters:
-        - $ref: '#/components/parameters/accountIdParam'
+        - $ref: '#/components/parameters/accountIdPathParam'
       requestBody:
         required: true
         content:
@@ -296,7 +266,7 @@ paths:
       security:
         - bearerAuth: []
       parameters:
-        - $ref: '#/components/parameters/accountIdParam'
+        - $ref: '#/components/parameters/accountIdPathParam'
       responses:
         '204':
           description: No Content
@@ -318,8 +288,8 @@ paths:
       security:
         - bearerAuth: []
       parameters:
-        - $ref: '#/components/parameters/pageParam'
-        - $ref: '#/components/parameters/limitParam'
+        - $ref: '#/components/parameters/pageQueryParam'
+        - $ref: '#/components/parameters/limitQueryParam'
       responses:
         '200':
           description: OK
@@ -343,7 +313,7 @@ paths:
       security:
         - bearerAuth: []
       parameters:
-        - $ref: '#/components/parameters/followRequestIdParam'
+        - $ref: '#/components/parameters/followRequestIdPathParam'
       responses:
         '200':
           description: OK
@@ -368,7 +338,7 @@ paths:
       security:
         - bearerAuth: []
       parameters:
-        - $ref: '#/components/parameters/followRequestIdParam'
+        - $ref: '#/components/parameters/followRequestIdPathParam'
       requestBody:
         required: true
         content:
@@ -401,7 +371,7 @@ paths:
       security:
         - bearerAuth: []
       parameters:
-        - $ref: '#/components/parameters/followRequestIdParam'
+        - $ref: '#/components/parameters/followRequestIdPathParam'
       responses:
         '204':
           description: No Content
@@ -423,8 +393,8 @@ paths:
       security:
         - bearerAuth: []
       parameters:
-        - $ref: '#/components/parameters/pageParam'
-        - $ref: '#/components/parameters/limitParam'
+        - $ref: '#/components/parameters/pageQueryParam'
+        - $ref: '#/components/parameters/limitQueryParam'
       responses:
         '200':
           description: OK
@@ -448,7 +418,7 @@ paths:
       security:
         - bearerAuth: []
       parameters:
-        - $ref: '#/components/parameters/notificationIdParam'
+        - $ref: '#/components/parameters/notificationIdPathParam'
       requestBody:
         required: true
         content:
@@ -480,21 +450,23 @@ paths:
       security:
         - bearerAuth: []
       parameters:
-        - $ref: '#/components/parameters/pageParam'
-        - $ref: '#/components/parameters/limitParam'
-        - $ref: '#/components/parameters/activityTypeParam'
-        - $ref: '#/components/parameters/activityTitleParam'
-        - $ref: '#/components/parameters/activityDescriptionParam'
-        - $ref: '#/components/parameters/activityCategoryIdParam'
-        - $ref: '#/components/parameters/activityMinPriceParam'
-        - $ref: '#/components/parameters/activityMaxPriceParam'
-        - $ref: '#/components/parameters/activityTimeStartParam'
-        - $ref: '#/components/parameters/activityTimeEndParam'
-        - $ref: '#/components/parameters/activityMinParcipantsParam'
-        - $ref: '#/components/parameters/activityMaxParcipantsParam'
-        - $ref: '#/components/parameters/activityMinEntriesParam'
-        - $ref: '#/components/parameters/activityMaxEntriesParam'
-        - $ref: '#/components/parameters/activityLanguageParam'
+        - $ref: '#/components/parameters/pageQueryParam'
+        - $ref: '#/components/parameters/limitQueryParam'
+        - $ref: '#/components/parameters/accountIdQueryParam'
+        - $ref: '#/components/parameters/activityTypeQueryParam'
+        - $ref: '#/components/parameters/activityTitleQueryParam'
+        - $ref: '#/components/parameters/activityDescriptionQueryParam'
+        - $ref: '#/components/parameters/activityCategoryIdQueryParam'
+        - $ref: '#/components/parameters/activityMinPriceQueryParam'
+        - $ref: '#/components/parameters/activityMaxPriceQueryParam'
+        - $ref: '#/components/parameters/activityTimeStartQueryParam'
+        - $ref: '#/components/parameters/activityTimeEndQueryParam'
+        - $ref: '#/components/parameters/activityMinParcipantsQueryParam'
+        - $ref: '#/components/parameters/activityMaxParcipantsQueryParam'
+        - $ref: '#/components/parameters/activityMinEntriesQueryParam'
+        - $ref: '#/components/parameters/activityMaxEntriesQueryParam'
+        - $ref: '#/components/parameters/activityGeolocationQueryParam'
+        - $ref: '#/components/parameters/activityLanguageQueryParam'
       responses:
         '200':
           description: OK
@@ -547,7 +519,7 @@ paths:
       security:
         - bearerAuth: []
       parameters:
-        - $ref: '#/components/parameters/activityIdParam'
+        - $ref: '#/components/parameters/activityIdPathParam'
       responses:
         '200':
           description: OK
@@ -572,7 +544,7 @@ paths:
       security:
         - bearerAuth: []
       parameters:
-        - $ref: '#/components/parameters/activityIdParam'
+        - $ref: '#/components/parameters/activityIdPathParam'
       requestBody:
         required: true
         content:
@@ -605,7 +577,7 @@ paths:
       security:
         - bearerAuth: []
       parameters:
-        - $ref: '#/components/parameters/activityIdParam'
+        - $ref: '#/components/parameters/activityIdPathParam'
       responses:
         '204':
           description: No Content
@@ -627,11 +599,11 @@ paths:
       security:
         - bearerAuth: []
       parameters:
-        - $ref: '#/components/parameters/activityIdParam'
-        - $ref: '#/components/parameters/pageParam'
-        - $ref: '#/components/parameters/limitParam'
-        - $ref: '#/components/parameters/accountNameParam'
-        - $ref: '#/components/parameters/accountUsernameParam'
+        - $ref: '#/components/parameters/activityIdPathParam'
+        - $ref: '#/components/parameters/pageQueryParam'
+        - $ref: '#/components/parameters/limitQueryParam'
+        - $ref: '#/components/parameters/accountNameQueryParam'
+        - $ref: '#/components/parameters/accountUsernameQueryParam'
       responses:
         '200':
           description: OK
@@ -656,7 +628,7 @@ paths:
       security:
         - bearerAuth: []
       parameters:
-        - $ref: '#/components/parameters/activityIdParam'
+        - $ref: '#/components/parameters/activityIdPathParam'
       responses:
         '201':
           description: Created
@@ -681,7 +653,7 @@ paths:
       security:
         - bearerAuth: []
       parameters:
-        - $ref: '#/components/parameters/activityIdParam'
+        - $ref: '#/components/parameters/activityIdPathParam'
       responses:
         '204':
           description: No Content
@@ -725,10 +697,11 @@ paths:
       security:
         - bearerAuth: []
       parameters:
-        - $ref: '#/components/parameters/pageParam'
-        - $ref: '#/components/parameters/limitParam'
-        - $ref: '#/components/parameters/establishmentNameParam'
-        - $ref: '#/components/parameters/establishmentAddressParam'
+        - $ref: '#/components/parameters/pageQueryParam'
+        - $ref: '#/components/parameters/limitQueryParam'
+        - $ref: '#/components/parameters/establishmentNameQueryParam'
+        - $ref: '#/components/parameters/establishmentAddressQueryParam'
+        - $ref: '#/components/parameters/establishmentOwnerQueryParam'
       responses:
         '200':
           description: OK
@@ -781,7 +754,7 @@ paths:
       security:
         - bearerAuth: []
       parameters:
-        - $ref: '#/components/parameters/establishmentIdParam'
+        - $ref: '#/components/parameters/establishmentIdPathParam'
       responses:
         '200':
           description: OK
@@ -806,7 +779,7 @@ paths:
       security:
         - bearerAuth: []
       parameters:
-        - $ref: '#/components/parameters/establishmentIdParam'
+        - $ref: '#/components/parameters/establishmentIdPathParam'
       requestBody:
         required: true
         content:
@@ -839,7 +812,7 @@ paths:
       security:
         - bearerAuth: []
       parameters:
-        - $ref: '#/components/parameters/establishmentIdParam'
+        - $ref: '#/components/parameters/establishmentIdPathParam'
       responses:
         '204':
           description: No Content
@@ -851,19 +824,20 @@ paths:
           $ref: '#/components/responses/ForbiddenError'
         '500':
           $ref: '#/components/responses/InternalServerError'
-  /establishments/{id}/requests:
+  /establishments/requests:
     get:
       tags:
         - Establishments
-      summary: Get establishment requests
+      summary: Get establishments requests
       operationId: getEstablishmentRequests
       description: Get all establishment requests
       security:
         - bearerAuth: []
       parameters:
-        - $ref: '#/components/parameters/establishmentIdParam'
-        - $ref: '#/components/parameters/pageParam'
-        - $ref: '#/components/parameters/limitParam'
+        - $ref: '#/components/parameters/pageQueryParam'
+        - $ref: '#/components/parameters/limitQueryParam'
+        - $ref: '#/components/parameters/activityIdQueryParam'
+        - $ref: '#/components/parameters/establishmentIdQueryParam'
       responses:
         '200':
           description: OK
@@ -877,38 +851,7 @@ paths:
           $ref: '#/components/responses/ForbiddenError'
         '500':
           $ref: '#/components/responses/InternalServerError'
-    post:
-      tags:
-        - Establishments
-      summary: Create establishment request
-      operationId: createEstablishmentRequest
-      description: Create establishment request
-      security:
-        - bearerAuth: []
-      parameters:
-        - $ref: '#/components/parameters/establishmentIdParam'
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/EstablishmentRequestDTO'
-      responses:
-        '201':
-          description: Created
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/EstablishmentRequestResponse'
-        '400':
-          $ref: '#/components/responses/BadRequestError'
-        '401':
-          $ref: '#/components/responses/UnauthorizedError'
-        '403':
-          $ref: '#/components/responses/ForbiddenError'
-        '500':
-          $ref: '#/components/responses/InternalServerError'
-  /establishments/{id}/requests/{requestId}:
+  /establishments/requests/{id}:
     patch:
       tags:
         - Establishments
@@ -918,8 +861,7 @@ paths:
       security:
         - bearerAuth: []
       parameters:
-        - $ref: '#/components/parameters/establishmentIdParam'
-        - $ref: '#/components/parameters/establishmentRequestIdParam'
+        - $ref: '#/components/parameters/establishmentRequestIdPathParam'
       requestBody:
         required: true
         content:
@@ -952,8 +894,7 @@ paths:
       security:
         - bearerAuth: []
       parameters:
-        - $ref: '#/components/parameters/establishmentIdParam'
-        - $ref: '#/components/parameters/establishmentRequestIdParam'
+        - $ref: '#/components/parameters/establishmentRequestIdPathParam'
       responses:
         '204':
           description: No Content
@@ -1060,9 +1001,15 @@ components:
           type: string
           format: uuid
         follower:
-          $ref: '#/components/schemas/AccountPersonalDTO'
+          oneOf:
+            - type: string
+              format: uuid
+            - $ref: '#/components/schemas/AccountPersonalDTO'
         following:
-          $ref: '#/components/schemas/AccountDTO'
+          oneOf:
+            - type: string
+              format: uuid
+            - $ref: '#/components/schemas/AccountDTO'
         isMuted:
           type: boolean
           default: true
@@ -1084,9 +1031,15 @@ components:
           type: string
           format: uuid
         requestFrom:
-          $ref: '#/components/schemas/AccountPersonalDTO'
+          oneOf:
+            - type: string
+              format: uuid
+            - $ref: '#/components/schemas/AccountPersonalDTO'
         requestTo:
-          $ref: '#/components/schemas/AccountDTO'
+          oneOf:
+            - type: string
+              format: uuid
+            - $ref: '#/components/schemas/AccountDTO'
         status:
           type: string
           enum:
@@ -1128,11 +1081,20 @@ components:
           type: boolean
           default: false
         owner:
-          $ref: '#/components/schemas/AccountDTO'
+          oneOf:
+            - type: string
+              format: uuid
+            - $ref: '#/components/schemas/AccountDTO'
         relatedAccount:
-          $ref: '#/components/schemas/AccountDTO'
+          oneOf:
+            - type: string
+              format: uuid
+            - $ref: '#/components/schemas/AccountDTO'
         relatedActivity:
-          $ref: '#/components/schemas/ActivityDTO'
+          oneOf:
+            - type: string
+              format: uuid
+            - $ref: '#/components/schemas/ActivityDTO'
         createdAt:
           type: string
           format: date-time
@@ -1149,6 +1111,9 @@ components:
         - number
         - coordinates
       properties:
+        id:
+          type: string
+          format: uuid
         country:
           type: string
         postalCode:
@@ -1169,6 +1134,9 @@ components:
           type: string
         coordinates:
           type: object
+          required:
+            - latitude
+            - longitude
           properties:
             latitude:
               type: number
@@ -1198,8 +1166,20 @@ components:
       properties:
         location:
           oneOf:
+            - type: string
+              format: uuid
             - $ref: '#/components/schemas/EstablishmentDTO'
-            - $ref: '#/components/schemas/AddressDTO'
+            - type: object
+              properties:
+                coordinates:
+                  type: object
+                  properties:
+                    latitude:
+                      type: number
+                      format: double
+                    longitude:
+                      type: number
+                      format: double
         activityType:
           type: string
           enum: [onsite]
@@ -1237,9 +1217,15 @@ components:
           type: string
           format: uuid
         owner:
-          $ref: '#/components/schemas/AccountDTO'
+          oneOf:
+            - type: string
+              format: uuid
+            - $ref: '#/components/schemas/AccountDTO'
         category:
-          $ref: '#/components/schemas/ActivityCategoryDTO'
+          oneOf:
+            - type: string
+              format: uuid
+            - $ref: '#/components/schemas/ActivityCategoryDTO'
         title:
           type: string
         description:
@@ -1308,7 +1294,10 @@ components:
           type: string
           format: uuid
         parent:
-          $ref: '#/components/schemas/ActivityCategoryDTO'
+          oneOf:
+            - type: string
+              format: uuid
+            - $ref: '#/components/schemas/ActivityCategoryDTO'
         name:
           type: string
         i18nKey:
@@ -1334,9 +1323,15 @@ components:
           type: string
           format: uuid
         activity:
-          $ref: '#/components/schemas/ActivityDTO'
+          oneOf:
+            - type: string
+              format: uuid
+            - $ref: '#/components/schemas/ActivityDTO'
         account:
-          $ref: '#/components/schemas/AccountPersonalDTO'
+          oneOf:
+            - type: string
+              format: uuid
+            - $ref: '#/components/schemas/AccountPersonalDTO'
         createdAt:
           type: string
           format: date-time
@@ -1354,9 +1349,15 @@ components:
           type: string
           format: uuid
         owner:
-          $ref: '#/components/schemas/AccountEnterpriseDTO'
+          oneOf:
+            - type: string
+              format: uuid
+            - $ref: '#/components/schemas/AccountEnterpriseDTO'
         address:
-          $ref: '#/components/schemas/AddressDTO'
+          oneOf:
+            - type: string
+              format: uuid
+            - $ref: '#/components/schemas/AddressDTO'
         name:
           type: string
         createdAt:
@@ -1368,25 +1369,30 @@ components:
     EstablishmentRequestDTO:
       type: object
       required:
-        - requestFromAccount
-        - requestForActivity
+        - requestFromActivity
         - requestToEstablishment
+        - status
       properties:
         id:
           type: string
           format: uuid
-        requestFromAccount:
-          $ref: '#/components/schemas/AccountEnterpriseDTO'
-        requestForActivity:
-          $ref: '#/components/schemas/ActivityOnsiteDTO'
+        requestFromActivity:
+          oneOf:
+            - type: string
+              format: uuid
+            - $ref: '#/components/schemas/ActivityOnsiteDTO'
         requestToEstablishment:
-          $ref: '#/components/schemas/EstablishmentDTO'
+          oneOf:
+            - type: string
+              format: uuid
+            - $ref: '#/components/schemas/EstablishmentDTO'
         status:
           type: string
           enum:
             - pending
             - approved
             - rejected
+          default: pending
         createdAt:
           type: string
           format: date-time
@@ -1659,7 +1665,7 @@ components:
       scheme: bearer
       bearerFormat: JWT
   parameters:
-    pageParam:
+    pageQueryParam:
       name: page
       description: Page number for pagination
       in: query
@@ -1667,7 +1673,7 @@ components:
         type: integer
         format: int32
         default: 1
-    limitParam:
+    limitQueryParam:
       name: limit
       description: Number of items per page for pagination
       in: query
@@ -1675,7 +1681,7 @@ components:
         type: integer
         format: int32
         default: 10
-    accountIdParam:
+    accountIdPathParam:
       name: id
       description: Account ID
       in: path
@@ -1683,7 +1689,14 @@ components:
       schema:
         type: string
         format: uuid
-    accountTypeParam:
+    accountIdQueryParam:
+      name: accountId
+      description: Account ID
+      in: query
+      schema:
+        type: string
+        format: uuid
+    accountTypeQueryParam:
       name: type
       description: Account type
       in: query
@@ -1692,7 +1705,7 @@ components:
         enum:
           - personal
           - enterprise
-    accountNameParam:
+    accountNameQueryParam:
       name: name
       description: Account name
       in: query
@@ -1701,7 +1714,7 @@ components:
         minLength: 2
         maxLength: 50
         pattern: '(^[a-zA-Zñ\s]+$)'
-    accountUsernameParam:
+    accountUsernameQueryParam:
       name: username
       description: Account username
       in: query
@@ -1710,7 +1723,7 @@ components:
         minLength: 4
         maxLength: 30
         pattern: '(^[a-z_0-9]+$)'
-    followRequestIdParam:
+    followRequestIdPathParam:
       name: id
       description: Follow request ID
       in: path
@@ -1718,7 +1731,7 @@ components:
       schema:
         type: string
         format: uuid
-    notificationIdParam:
+    notificationIdPathParam:
       name: id
       description: Notification ID
       in: path
@@ -1726,7 +1739,7 @@ components:
       schema:
         type: string
         format: uuid
-    establishmentIdParam:
+    establishmentIdPathParam:
       name: id
       description: Establishment ID
       in: path
@@ -1734,27 +1747,48 @@ components:
       schema:
         type: string
         format: uuid
-    establishmentNameParam:
+    activityIdQueryParam:
+      name: activityId
+      description: Activity ID
+      in: query
+      schema:
+        type: string
+        format: uuid
+    establishmentIdQueryParam:
+      name: establishmentId
+      description: Establishment ID
+      in: query
+      schema:
+        type: string
+        format: uuid
+    establishmentNameQueryParam:
       name: name
       description: Establishment name
       in: query
       schema:
         type: string
-    establishmentAddressParam:
+    establishmentAddressQueryParam:
       name: address
       description: Establishment address
       in: query
       schema:
         type: string
-    establishmentRequestIdParam:
-      name: requestId
+    establishmentOwnerQueryParam:
+      name: owner
+      description: Establishment owner ID
+      in: query
+      schema:
+        type: string
+        format: uuid
+    establishmentRequestIdPathParam:
+      name: id
       description: Establishment request ID
       in: path
       required: true
       schema:
         type: string
         format: uuid
-    activityIdParam:
+    activityIdPathParam:
       name: id
       description: Activity ID
       in: path
@@ -1762,46 +1796,46 @@ components:
       schema:
         type: string
         format: uuid
-    activityTitleParam:
+    activityTitleQueryParam:
       name: title
       description: Activity title
       in: query
       schema:
         type: string
-    activityDescriptionParam:
+    activityDescriptionQueryParam:
       name: description
       description: Activity description
       in: query
       schema:
         type: string
-    activityCategoryIdParam:
+    activityCategoryIdQueryParam:
       name: categoryId
       description: Activity category ID
       in: query
       schema:
         type: string
         format: uuid
-    activityMinPriceParam:
+    activityMinPriceQueryParam:
       name: minPrice
       description: Activity min price
       in: query
       schema:
         type: number
         format: double
-    activityMaxPriceParam:
+    activityMaxPriceQueryParam:
       name: maxPrice
       description: Activity max price
       in: query
       schema:
         type: number
         format: double
-    activityLanguageParam:
+    activityLanguageQueryParam:
       name: language
       description: Activity language
       in: query
       schema:
         type: string
-    activityTypeParam:
+    activityTypeQueryParam:
       name: type
       description: Activity type
       in: query
@@ -1810,48 +1844,65 @@ components:
         enum:
           - onsite
           - online
-    activityTimeStartParam:
+    activityTimeStartQueryParam:
       name: timeStart
       description: Activity time start
       in: query
       schema:
         type: string
         format: date-time
-    activityTimeEndParam:
+    activityTimeEndQueryParam:
       name: timeEnd
       description: Activity time end
       in: query
       schema:
         type: string
         format: date-time
-    activityMinParcipantsParam:
+    activityMinParcipantsQueryParam:
       name: minParticipants
       description: Activity min participants
       in: query
       schema:
         type: integer
         format: int32
-    activityMaxParcipantsParam:
+    activityMaxParcipantsQueryParam:
       name: maxParticipants
       description: Activity max participants
       in: query
       schema:
         type: integer
         format: int32
-    activityMinEntriesParam:
+    activityMinEntriesQueryParam:
       name: minEntries
       description: Activity min entries
       in: query
       schema:
         type: integer
         format: int32
-    activityMaxEntriesParam:
+    activityMaxEntriesQueryParam:
       name: maxEntries
       description: Activity max entries
       in: query
       schema:
         type: integer
         format: int32
+    activityGeolocationQueryParam:
+      name: geolocation
+      description: Activity geolocation
+      in: query
+      schema:
+        type: object
+        properties:
+          latitude:
+            type: number
+            format: double
+          longitude:
+            type: number
+            format: double
+          radius:
+            type: number
+            format: double
+            default: 1000
   responses:
     BadRequestError:
       description: Bad Request
